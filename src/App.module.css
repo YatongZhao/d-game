@@ -1,0 +1,41 @@
+.canvas {
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+.info {
+    position: fixed;
+    left: 0;
+    top: 0;
+}
+.gameEndBox {
+    transition: all .3s;
+    box-sizing: border-box;
+    position: fixed;
+    left: 50%;
+    top: 400px;
+    transform: translate3d(-50%, -50%, 0);
+    overflow: hidden;
+    border: 1px solid #000;
+    height: 0;
+    width: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 5px;
+    background-color: #fff;
+    opacity: 0;
+    flex-direction: column;
+}
+.end {
+    height: 50px;
+    opacity: 1;
+    width: 300px;
+}
+.restartBtn {
+    width: 100%;
+    height: 20px;
+    border: 0;
+    outline: none;
+    background-color: chartreuse;
+}
