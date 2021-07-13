@@ -5,8 +5,10 @@ import { Hero } from "./Hero/Hero";
 import { Point } from "./Point";
 import { drawRoundRect } from "./tool";
 
+const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(window.navigator.userAgent);
+
 export class Game {
-    coordinate = new Coordinate(110, 0);
+    coordinate = new Coordinate(0, 0);
 
     enemys: Enemy[] = [];
 
@@ -23,39 +25,43 @@ export class Game {
 
     bullets: Bullet[] = [];
 
+    width = 460;
+    height = window.innerHeight * 460 / window.innerWidth;
+    sizeRate = 460 / window.innerWidth;
+
+    targetY = this.height - 150;
+    targetLineLeft = this.coordinate.point(0, this.targetY);
+    targetLineRight = this.coordinate.point(this.width, this.targetY);
+
+    offStageHeroY = this.height - 70;
+    onStageHeroY = this.height - 120;
     // 数组顺序不要动
     heroPosList = [
-        new Point(55, 860, this.coordinate),
-        new Point(95, 860, this.coordinate),
-        new Point(135, 860, this.coordinate),
-        new Point(175, 860, this.coordinate),
-        new Point(215, 860, this.coordinate),
-        new Point(255, 860, this.coordinate),
-        new Point(295, 860, this.coordinate),
-        new Point(335, 860, this.coordinate),
-        new Point(375, 860, this.coordinate),
+        new Point(55, this.offStageHeroY, this.coordinate),
+        new Point(95, this.offStageHeroY, this.coordinate),
+        new Point(135, this.offStageHeroY, this.coordinate),
+        new Point(175, this.offStageHeroY, this.coordinate),
+        new Point(215, this.offStageHeroY, this.coordinate),
+        new Point(255, this.offStageHeroY, this.coordinate),
+        new Point(295, this.offStageHeroY, this.coordinate),
+        new Point(335, this.offStageHeroY, this.coordinate),
+        new Point(375, this.offStageHeroY, this.coordinate),
 
-        new Point(55, 810, this.coordinate),
-        new Point(95, 810, this.coordinate),
-        new Point(135, 810, this.coordinate),
-        new Point(175, 810, this.coordinate),
-        new Point(215, 810, this.coordinate),
-        new Point(255, 810, this.coordinate),
-        new Point(295, 810, this.coordinate),
-        new Point(335, 810, this.coordinate),
-        new Point(375, 810, this.coordinate)
+        new Point(55, this.onStageHeroY, this.coordinate),
+        new Point(95, this.onStageHeroY, this.coordinate),
+        new Point(135, this.onStageHeroY, this.coordinate),
+        new Point(175, this.onStageHeroY, this.coordinate),
+        new Point(215, this.onStageHeroY, this.coordinate),
+        new Point(255, this.onStageHeroY, this.coordinate),
+        new Point(295, this.onStageHeroY, this.coordinate),
+        new Point(335, this.onStageHeroY, this.coordinate),
+        new Point(375, this.onStageHeroY, this.coordinate)
     ];
 
     cycle = 60;
     step = 0;
     setEnd: React.Dispatch<React.SetStateAction<boolean>> | null = null;
 
-    width = 460;
-    height = 900;
-
-    targetY = 800;
-    targetLineLeft = this.coordinate.point(0, this.targetY);
-    targetLineRight = this.coordinate.point(this.width, this.targetY);
 
     isMouseDown = false;
     mouseSelectItem: Hero | null = null;
@@ -68,6 +74,7 @@ export class Game {
         this.go();
 
         this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleTouchMove = this.handleTouchMove.bind(this);
     }
 
     restart() {
@@ -132,6 +139,17 @@ export class Game {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeRect(...this.coordinate.origin, this.width, this.height);
 
+        if (this.isMouseDown) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'red';
+            this.heroPosList.forEach(pos => {
+                drawRoundRect(...pos.plus(8, 8).toNumber(), 14, 14, 5, ctx);
+            });
+            ctx.strokeStyle = 'black';
+            ctx.closePath();
+        }
+
+        ctx.beginPath();
         this.offStageHeros.forEach(hero => {
             hero?.render(ctx);
         });
@@ -139,6 +157,7 @@ export class Game {
         this.onStageHeros.forEach(hero => {
             hero?.render(ctx);
         });
+        ctx.closePath();
 
         let isEnd = false;
         this.enemys.forEach(enemy => {
@@ -148,30 +167,32 @@ export class Game {
             }
         });
 
+        ctx.beginPath();
         ctx.moveTo(...this.targetLineLeft.toNumber());
         ctx.lineTo(...this.targetLineRight.toNumber());
         ctx.stroke();
+        ctx.closePath();
 
-        if (this.isMouseDown) {
-
-            ctx.strokeStyle = 'red';
-            this.heroPosList.forEach(pos => {
-                drawRoundRect(...pos.plus(8, 8).toNumber(), 14, 14, 5, ctx);
-            });
-            ctx.strokeStyle = 'black';
-        }
-
+        ctx.beginPath();
         this.bullets.forEach(bullet => {
             bullet.render(ctx);
         });
+        ctx.closePath();
 
         if (this.mouseSelectItem) {
             this.mouseSelectItem.render(ctx, [
                 this.mouseSelectItemPosition[0] + this.mouseSelectItemOffset[0],
                 this.mouseSelectItemPosition[1] + this.mouseSelectItemOffset[1],
             ]);
-        }
+            if (isMobile) {
+                ctx.putImageData(ctx.getImageData(
+                    0, this.targetY, this.width, 150
+                ), 0, this.targetY - 150);
 
+                ctx.rect(0, this.targetY - 150, this.width, 150);
+                ctx.stroke();
+            }
+        }
         if (isEnd) {
             this.setEnd && this.setEnd(true);
             return;
@@ -195,7 +216,11 @@ export class Game {
         if (position === undefined) return;
         this.offStageHeros[position] = hero;
         if (hero) {
+            hero.point.y = this.offStageHeroY;
+            hero.point.x = 55 + position * 40;
             hero.addToOffStage(position);
+
+            if (hero.level >= 3) return;
 
             let list: (0|1|2|3|4|5|6|7|8)[] = [];
             this.offStageHeros.forEach((_hero, i) => {
@@ -226,8 +251,10 @@ export class Game {
         if (position === undefined) return;
         this.onStageHeros[position] = hero;
         if (hero) {
-            hero.point.y = 810;
+            hero.point.y = this.onStageHeroY;
             hero.point.x = 55 + position * 40;
+
+            if (hero.level >= 3) return;
 
             let list: (0|1|2|3|4|5|6|7|8)[] = [];
             this.onStageHeros.forEach((_hero, i) => {
@@ -248,20 +275,33 @@ export class Game {
     handleCanvasMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
         this.isMouseDown = true;
 
-        this.findHero(this.offStageHeros, e, 'off');
-        this.findHero(this.onStageHeros, e, 'on');
+        let isFindOffStage = this.findHero(this.offStageHeros, e.clientX, e.clientY, 'off');
+        let isFindOnStage = this.findHero(this.onStageHeros, e.clientX, e.clientY, 'on');
+
+        if (isFindOffStage || isFindOnStage) window.addEventListener('mousemove', this.handleMouseMove);
     }
 
-    findHero(heros: (Hero|null)[], e: React.MouseEvent<HTMLCanvasElement>, type: 'off'|'on') {
+    handleTouchStart(e: React.TouchEvent<HTMLCanvasElement>) {
+        e.stopPropagation();
+        e.preventDefault();
+        this.isMouseDown = true;
+
+        let isFindOffStage = this.findHero(this.offStageHeros, e.touches[0].clientX, e.touches[0].clientY, 'off');
+        let isFindOnStage = this.findHero(this.onStageHeros, e.touches[0].clientX, e.touches[0].clientY, 'on');
+
+        if (isFindOffStage || isFindOnStage) window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+    }
+
+    findHero(heros: (Hero|null)[], clientX: number, clientY: number, type: 'off'|'on'): boolean {
         let heroIndex = heros.findIndex(hero => {
             if (!hero) return false;
 
-            let isTrue = hero.isPointIn(e.clientX, e.clientY);
+            let isTrue = hero.isPointIn(clientX * this.sizeRate, clientY * this.sizeRate);
             if (isTrue) {
                 let o = hero.point.toNumber();
                 this.mouseSelectItemOffset = [
-                    o[0] - e.clientX,
-                    o[1] - e.clientY
+                    o[0] - clientX * this.sizeRate,
+                    o[1] - clientY * this.sizeRate
                 ];
             }
             return isTrue;
@@ -271,15 +311,24 @@ export class Game {
             this.mouseSelectItem = heros[heroIndex];
             this.mouseSelectItemType = type;
             this.mouseSelectItemIndex = heroIndex as 0;
-            this.mouseSelectItemPosition = [e.clientX, e.clientY];
-            window.addEventListener('mousemove', this.handleMouseMove);
+            this.mouseSelectItemPosition = [clientX * this.sizeRate, clientY * this.sizeRate];
+            return true;
         }
+        return false;
     }
 
     handleMouseUp(e: MouseEvent) {
         window.removeEventListener('mousemove', this.handleMouseMove);
+        this.handleEventEnd(e.clientX, e.clientY);
+    }
 
-        let leftUp = [e.clientX + this.mouseSelectItemOffset[0], e.clientY + this.mouseSelectItemOffset[1]];
+    handleTouchEnd(e: TouchEvent) {
+        window.removeEventListener('touchmove', this.handleTouchMove);
+        this.handleEventEnd(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    }
+
+    handleEventEnd(clientX: number, clientY: number) {
+        let leftUp = [clientX * this.sizeRate + this.mouseSelectItemOffset[0], clientY * this.sizeRate + this.mouseSelectItemOffset[1]];
         let rightDown = [leftUp[0] + 30, leftUp[1] + 30];
 
         let pos = this.heroPosList.findIndex(pos => {
@@ -328,6 +377,16 @@ export class Game {
     }
 
     handleMouseMove(e: MouseEvent) {
-        this.mouseSelectItemPosition = [e.clientX, e.clientY];
+        this.handleMove(e.clientX, e.clientY);
+    }
+
+    handleTouchMove(e: TouchEvent) {
+        e.preventDefault();
+        e.stopPropagation();
+        this.handleMove(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    }
+
+    handleMove(clientX: number, clientY: number) {
+        this.mouseSelectItemPosition = [clientX * this.sizeRate, clientY * this.sizeRate];
     }
 }

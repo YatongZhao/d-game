@@ -13,8 +13,10 @@ const App = () => {
 
     useEffect(() => {
         if (!canvasRef.current) return;
-        canvasRef.current.width = window.innerWidth;
-        canvasRef.current.height = window.innerHeight;
+        // canvasRef.current.width = window.innerWidth;
+        // canvasRef.current.height = window.innerHeight;
+        canvasRef.current.width = game.width;
+        canvasRef.current.height = game.height;
     }, [canvasRef]);
 
     useEffect(() => {
@@ -27,9 +29,12 @@ const App = () => {
 
     useEffect(() => {
         const handler = game.handleMouseUp.bind(game);
+        const touchEndHandler = game.handleTouchEnd.bind(game);
         window.addEventListener('mouseup', handler);
+        window.addEventListener('touchend', touchEndHandler)
         return () => {
             window.removeEventListener('mouseup', handler);
+            window.removeEventListener('touchend', touchEndHandler);
         }
     }, []);
 
@@ -40,7 +45,9 @@ const App = () => {
     }
 
     return <>
-        <canvas ref={canvasRef} className={s.canvas} onMouseDown={game.handleCanvasMouseDown.bind(game)} />
+        <canvas ref={canvasRef} className={s.canvas}
+            onTouchStart={game.handleTouchStart.bind(game)}
+            onMouseDown={game.handleCanvasMouseDown.bind(game)} />
         <div className={s.info}>
             <div className={s.addHeroBox}>
                 <button className={s.addHeroBtn} onClick={() => {

@@ -52,7 +52,5 @@ export class Hero {
     }
 
     addToOffStage(position: 0|1|2|3|4|5|6|7|8) {
-        this.point.y = 860;
-        this.point.x = 55 + position * 40;
     }
 }
