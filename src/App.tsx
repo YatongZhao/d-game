@@ -101,7 +101,7 @@ const App = () => {
                         }}>
                             {p.name}
                             <div className={s.shopItemPrice}>
-                                $200
+                                $300
                             </div>
                         </li>)}
                     </ul>
