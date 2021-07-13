@@ -278,7 +278,9 @@ export class Game {
         let isFindOffStage = this.findHero(this.offStageHeros, e.clientX, e.clientY, 'off');
         let isFindOnStage = this.findHero(this.onStageHeros, e.clientX, e.clientY, 'on');
 
-        if (isFindOffStage || isFindOnStage) window.addEventListener('mousemove', this.handleMouseMove);
+        if (isFindOffStage || isFindOnStage) {
+            window.addEventListener('mousemove', this.handleMouseMove);
+        };
     }
 
     handleTouchStart(e: React.TouchEvent<HTMLCanvasElement>) {
@@ -287,9 +289,15 @@ export class Game {
         this.isMouseDown = true;
 
         let isFindOffStage = this.findHero(this.offStageHeros, e.touches[0].clientX, e.touches[0].clientY, 'off');
+        if (isFindOffStage) {
+            window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+            return;
+        }
         let isFindOnStage = this.findHero(this.onStageHeros, e.touches[0].clientX, e.touches[0].clientY, 'on');
-
-        if (isFindOffStage || isFindOnStage) window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+        if (isFindOnStage) {
+            window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+            return;
+        }
     }
 
     findHero(heros: (Hero|null)[], clientX: number, clientY: number, type: 'off'|'on'): boolean {
@@ -334,11 +342,11 @@ export class Game {
         let pos = this.heroPosList.findIndex(pos => {
             let p = pos.toNumber();
 
-            return leftUp[0] > p[0] - 8 && leftUp[1] > p[1] - 8
-                && rightDown[0] < p[0] + 38 && rightDown[1] < p[1] + 38;
+            return leftUp[0] > p[0] - 18 && leftUp[1] > p[1] - 18
+                && rightDown[0] < p[0] + 48 && rightDown[1] < p[1] + 48;
         });
 
-        if (pos !== -1) {
+        if (pos !== -1 && this.mouseSelectItem) {
             if (Math.floor(pos / 9) === 0) { // offStage
                 let targetI = pos % 9;
                 let temp = this.offStageHeros[targetI];

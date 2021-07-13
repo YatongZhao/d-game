@@ -47,8 +47,8 @@ export class Hero {
 
     isPointIn(x: number, y: number) {
         let [_x, _y] = this.point.toNumber();
-        return x >= _x && x <= _x + this.size
-            && y >= _y && y <= _y + this.size;
+        return x >= _x - 10 && x <= _x + this.size + 10
+            && y >= _y - 10 && y <= _y + this.size + 10;
     }
 
     addToOffStage(position: 0|1|2|3|4|5|6|7|8) {

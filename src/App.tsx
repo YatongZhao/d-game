@@ -1,20 +1,39 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Game } from './core';
 import s from './App.module.css';
-import { Hero } from './core/Hero/Hero';
 import { LightningHero } from './core/Hero/LightningHero';
 import { GrapeshotHero } from './core/Hero/GrapeshotHero';
 
 const game = new Game();
 
+const grapeshot = {
+    type: 'grapeshot-hero',
+    name: '霰弹'
+}
+
+const lightning = {
+    type: 'lightning-hero',
+    name: '闪电'
+}
+
+const createProductList = () => {
+    return [
+        Math.random() > 0.5 ? grapeshot : lightning,
+        Math.random() > 0.5 ? grapeshot : lightning,
+        Math.random() > 0.5 ? grapeshot : lightning,
+        Math.random() > 0.5 ? grapeshot : lightning,
+        Math.random() > 0.5 ? grapeshot : lightning
+    ];
+}
+
 const App = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [end, setEnd] = useState(false);
+    const [isShopOpen, setIsShopOpen] = useState(false);
+    const [productList, setProductList] = useState(createProductList());
 
     useEffect(() => {
         if (!canvasRef.current) return;
-        // canvasRef.current.width = window.innerWidth;
-        // canvasRef.current.height = window.innerHeight;
         canvasRef.current.width = game.width;
         canvasRef.current.height = game.height;
     }, [canvasRef]);
@@ -49,13 +68,27 @@ const App = () => {
             onTouchStart={game.handleTouchStart.bind(game)}
             onMouseDown={game.handleCanvasMouseDown.bind(game)} />
         <div className={s.info}>
-            <div className={s.addHeroBox}>
-                <button className={s.addHeroBtn} onClick={() => {
-                    game.addOffStageHero(new LightningHero(game));
-                }}>+闪电</button>
-                <button className={s.addHeroBtn} onClick={() => {
-                    game.addOffStageHero(new GrapeshotHero(game));
-                }}>+霰弹</button>
+            <div>
+                <button className={s.shopBtn} onClick={() => setIsShopOpen(!isShopOpen)}>商店</button>
+                {isShopOpen && <div className={s.shopBox}>
+                    <ul className={s.shopList}>
+                        {productList.map((p, i) => <li className={s.shopItem} key={i} onClick={() => {
+                            switch (p.type) {
+                                case 'grapeshot-hero':
+                                    game.addOffStageHero(new GrapeshotHero(game));
+                                    break;
+                                case 'lightning-hero':
+                                default:
+                                    game.addOffStageHero(new LightningHero(game));
+                                    break;
+                            }
+                            setIsShopOpen(false);
+                            setProductList(createProductList());
+                        }}>
+                            {p.name}
+                        </li>)}
+                    </ul>
+                </div>}
             </div>
             <div className={[s.gameEndBox, end ? s.end : ''].join(' ')}>
                 END
