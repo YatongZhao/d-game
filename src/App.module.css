@@ -62,11 +62,18 @@
     width: fit-content;
     flex-shrink: 0;
     padding: 0px 20px;
-    height: 30px;
-    line-height: 30px;
     text-align: center;
     cursor: pointer;
 }
 .shopItem:hover {
     color: red;
+}
+.shopItemPrice {
+    font-size: 12px;
+    color: red;
+}
+.shopError {
+    color: red;
+    font-size: 12px;
+    text-align: center;
 }

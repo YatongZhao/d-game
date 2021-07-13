@@ -13,7 +13,7 @@ export const drawRoundRect = (x: number, y: number, w: number, h: number, r: num
     ctx.stroke();
 }
 
-export const drawLightning = (p1: Point, p2: Point, ctx: CanvasRenderingContext2D) => {
+export const drawLightning = (p1: Point, p2: Point, ctx: CanvasRenderingContext2D, color?: string, lightColor?: string) => {
     const [pn1x, pn1y] = p1.toNumber();
     const [pn2x, pn2y] = p2.toNumber();
 
@@ -24,9 +24,9 @@ export const drawLightning = (p1: Point, p2: Point, ctx: CanvasRenderingContext2
     const cos = dx / l;
     const sin = dy / l;
 
-    ctx.strokeStyle = "white";
+    ctx.strokeStyle = color || "white";
 
-    ctx.shadowColor = 'blue';
+    ctx.shadowColor = lightColor || 'blue';
     ctx.shadowBlur = 14;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;

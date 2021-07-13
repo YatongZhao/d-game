@@ -31,6 +31,7 @@ const App = () => {
     const [end, setEnd] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [productList, setProductList] = useState(createProductList());
+    const [showShopError, setShowShopError] = useState(false);
 
     useEffect(() => {
         if (!canvasRef.current) return;
@@ -65,29 +66,48 @@ const App = () => {
 
     return <>
         <canvas ref={canvasRef} className={s.canvas}
+            onClick={() => {
+                setIsShopOpen(false);
+                setShowShopError(false);
+            }}
             onTouchStart={game.handleTouchStart.bind(game)}
             onMouseDown={game.handleCanvasMouseDown.bind(game)} />
         <div className={s.info}>
             <div>
-                <button className={s.shopBtn} onClick={() => setIsShopOpen(!isShopOpen)}>商店</button>
+                <button className={s.shopBtn} onClick={() => {
+                    setIsShopOpen(!isShopOpen);
+                    setShowShopError(false);
+                }}>商店</button>
                 {isShopOpen && <div className={s.shopBox}>
                     <ul className={s.shopList}>
                         {productList.map((p, i) => <li className={s.shopItem} key={i} onClick={() => {
+                            let buySuccess = false;
                             switch (p.type) {
                                 case 'grapeshot-hero':
-                                    game.addOffStageHero(new GrapeshotHero(game));
+                                    buySuccess = game.buyHero('grapeshot');
                                     break;
                                 case 'lightning-hero':
                                 default:
-                                    game.addOffStageHero(new LightningHero(game));
+                                    buySuccess = game.buyHero('lightning');
                                     break;
+                            }
+                            if (!buySuccess) {
+                                setShowShopError(true);
+                                return;
                             }
                             setIsShopOpen(false);
                             setProductList(createProductList());
+                            setShowShopError(false);
                         }}>
                             {p.name}
+                            <div className={s.shopItemPrice}>
+                                $200
+                            </div>
                         </li>)}
                     </ul>
+                    {showShopError && <div className={s.shopError}>
+                        钱不够！！！！！！
+                    </div>}
                 </div>}
             </div>
             <div className={[s.gameEndBox, end ? s.end : ''].join(' ')}>

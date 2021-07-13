@@ -1,7 +1,9 @@
 import { Bullet } from "./Bullet/Bullet";
 import { Coordinate } from "./Coordinate";
 import { Enemy } from "./Enemy/Enemy";
+import { GrapeshotHero } from "./Hero/GrapeshotHero";
 import { Hero } from "./Hero/Hero";
+import { LightningHero } from "./Hero/LightningHero";
 import { Point } from "./Point";
 import { drawRoundRect } from "./tool";
 
@@ -62,6 +64,8 @@ export class Game {
     step = 0;
     setEnd: React.Dispatch<React.SetStateAction<boolean>> | null = null;
 
+    $ = 200;
+
 
     isMouseDown = false;
     mouseSelectItem: Hero | null = null;
@@ -102,6 +106,24 @@ export class Game {
         this.enemys = this.enemys.filter(_enemy => {
             return _enemy !== enemy;
         });
+        this.$++;
+    }
+
+    buyHero(type: 'lightning' | 'grapeshot'): boolean {
+        switch (type) {
+            case 'lightning':
+                if (this.$ < 200) return false;
+                this.$ -= 200;
+                this.addOffStageHero(new LightningHero(this));
+                break;
+            case 'grapeshot':
+            default:
+                if (this.$ < 200) return false;
+                this.$ -= 200;
+                this.addOffStageHero(new GrapeshotHero(this));
+                break;
+        }
+        return true;
     }
 
     go() {
@@ -193,6 +215,16 @@ export class Game {
                 ctx.stroke();
             }
         }
+
+        ctx.beginPath();
+        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = 'red';
+        ctx.textAlign = 'right';
+        ctx.fillText(`$:${this.$}`, 440, 30);
+        ctx.font = '12px Arial';
+        ctx.fillStyle = 'black';
+        ctx.closePath();
+
         if (isEnd) {
             this.setEnd && this.setEnd(true);
             return;

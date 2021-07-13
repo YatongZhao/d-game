@@ -30,6 +30,28 @@ export class LightningHero extends Hero {
                 return 3;
         }
     }
+    get _color() {
+        switch (this.level) {
+            case 1:
+                return 'white';
+            case 2:
+                return 'white';
+            default:
+            case 3:
+                return 'black';
+        }
+    }
+    get _lightColor() {
+        switch (this.level) {
+            case 1:
+                return 'blue';
+            case 2:
+                return 'red';
+            default:
+            case 3:
+                return 'red';
+        }
+    }
     get targetMaxLength() {
         switch (this.level) {
             case 1:
@@ -115,7 +137,7 @@ export class LightningHero extends Hero {
 
         while (chain) {
             let p2 = chain.value.point.plus(chain.value.size / 2, chain.value.size / 2);
-            drawLightning(p1, p2, ctx);
+            drawLightning(p1, p2, ctx, this._color, this._lightColor);
 
             p1 = chain.value.point.plus(chain.value.size / 2, chain.value.size / 2);
             chain = chain.next;
