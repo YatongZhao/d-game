@@ -1,6 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Game, GrapeshotHero, Hero, LightningHero } from './core';
+import { Game } from './core';
 import s from './App.module.css';
+import { Hero } from './core/Hero/Hero';
+import { LightningHero } from './core/Hero/LightningHero';
+import { GrapeshotHero } from './core/Hero/GrapeshotHero';
 
 const game = new Game();
 
@@ -46,9 +49,6 @@ const App = () => {
                 <button className={s.addHeroBtn} onClick={() => {
                     game.addOffStageHero(new GrapeshotHero(game));
                 }}>+霰弹</button>
-                <button className={s.addHeroBtn} onClick={() => {
-                    game.addOffStageHero(new Hero(game));
-                }}>+基础</button>
             </div>
             <div className={[s.gameEndBox, end ? s.end : ''].join(' ')}>
                 END
