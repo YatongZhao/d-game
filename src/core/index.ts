@@ -88,6 +88,8 @@ export class Game {
         this.onStageHeros = [null, null, null, null, null, null, null, null, null];
         this.bullets = [];
         this.step = 0;
+        this.$ = 300;
+        this.score = 0;
         this.go();
     }
 
