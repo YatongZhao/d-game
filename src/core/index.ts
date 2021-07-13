@@ -65,6 +65,7 @@ export class Game {
     setEnd: React.Dispatch<React.SetStateAction<boolean>> | null = null;
 
     $ = 300;
+    score = 0;
 
 
     isMouseDown = false;
@@ -221,6 +222,15 @@ export class Game {
         ctx.fillStyle = 'red';
         ctx.textAlign = 'right';
         ctx.fillText(`$:${this.$}`, 440, 30);
+        ctx.font = '12px Arial';
+        ctx.fillStyle = 'black';
+        ctx.closePath();
+
+        ctx.beginPath();
+        ctx.font = 'bold 24px Arial';
+        ctx.fillStyle = 'red';
+        ctx.textAlign = 'left';
+        ctx.fillText(`score:${this.score}`, 20, 30);
         ctx.font = '12px Arial';
         ctx.fillStyle = 'black';
         ctx.closePath();

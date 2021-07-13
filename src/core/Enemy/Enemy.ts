@@ -20,6 +20,7 @@ export class Enemy {
 
     hited() {
         this.value--;
+        this.game.score++;
 
         if (this.value <= 0) {
             this.game.removeEnemy(this);

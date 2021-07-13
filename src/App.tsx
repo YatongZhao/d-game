@@ -1,8 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Game } from './core';
 import s from './App.module.css';
-import { LightningHero } from './core/Hero/LightningHero';
-import { GrapeshotHero } from './core/Hero/GrapeshotHero';
 
 const game = new Game();
 
