@@ -64,7 +64,7 @@ export class Game {
     step = 0;
     setEnd: React.Dispatch<React.SetStateAction<boolean>> | null = null;
 
-    $ = 200;
+    $ = 300;
 
 
     isMouseDown = false;
@@ -112,14 +112,14 @@ export class Game {
     buyHero(type: 'lightning' | 'grapeshot'): boolean {
         switch (type) {
             case 'lightning':
-                if (this.$ < 200) return false;
-                this.$ -= 200;
+                if (this.$ < 300) return false;
+                this.$ -= 300;
                 this.addOffStageHero(new LightningHero(this));
                 break;
             case 'grapeshot':
             default:
-                if (this.$ < 200) return false;
-                this.$ -= 200;
+                if (this.$ < 300) return false;
+                this.$ -= 300;
                 this.addOffStageHero(new GrapeshotHero(this));
                 break;
         }
