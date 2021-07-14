@@ -6,21 +6,41 @@ const game = new Game();
 
 const grapeshot = {
     type: 'grapeshot-hero',
-    name: '霰弹'
+    name: '霰弹',
+    price: 300
 }
 
 const lightning = {
     type: 'lightning-hero',
-    name: '闪电'
+    name: '闪电',
+    price: 300
+}
+
+const sniper = {
+    type: 'sniper-hero',
+    name: '狙击手',
+    price: 500
+}
+
+const createProduct = () => {
+    let r = Math.random();
+
+    if (r < 0.33) {
+        return grapeshot;
+    } else if (r < 0.66) {
+        return lightning;
+    } else {
+        return sniper;
+    }
 }
 
 const createProductList = () => {
     return [
-        Math.random() > 0.5 ? grapeshot : lightning,
-        Math.random() > 0.5 ? grapeshot : lightning,
-        Math.random() > 0.5 ? grapeshot : lightning,
-        Math.random() > 0.5 ? grapeshot : lightning,
-        Math.random() > 0.5 ? grapeshot : lightning
+        createProduct(),
+        createProduct(),
+        createProduct(),
+        createProduct(),
+        createProduct()
     ];
 }
 
@@ -84,6 +104,9 @@ const App = () => {
                                 case 'grapeshot-hero':
                                     buySuccess = game.buyHero('grapeshot');
                                     break;
+                                case 'sniper-hero':
+                                    buySuccess = game.buyHero('sniper');
+                                    break;
                                 case 'lightning-hero':
                                 default:
                                     buySuccess = game.buyHero('lightning');
@@ -99,7 +122,7 @@ const App = () => {
                         }}>
                             {p.name}
                             <div className={s.shopItemPrice}>
-                                $300
+                                ${p.price}
                             </div>
                         </li>)}
                     </ul>

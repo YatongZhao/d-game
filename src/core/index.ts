@@ -4,6 +4,7 @@ import { Enemy } from "./Enemy/Enemy";
 import { GrapeshotHero } from "./Hero/GrapeshotHero";
 import { Hero } from "./Hero/Hero";
 import { LightningHero } from "./Hero/LightningHero";
+import { SniperHero } from "./Hero/SniperHero";
 import { Point } from "./Point";
 import { drawRoundRect } from "./tool";
 
@@ -112,12 +113,17 @@ export class Game {
         this.$++;
     }
 
-    buyHero(type: 'lightning' | 'grapeshot'): boolean {
+    buyHero(type: 'lightning' | 'grapeshot' | 'sniper'): boolean {
         switch (type) {
             case 'lightning':
                 if (this.$ < 300) return false;
                 this.$ -= 300;
                 this.addOffStageHero(new LightningHero(this));
+                break;
+            case 'sniper':
+                if (this.$ < 500) return false;
+                this.$ -= 500;
+                this.addOffStageHero(new SniperHero(this));
                 break;
             case 'grapeshot':
             default:

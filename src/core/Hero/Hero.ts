@@ -32,14 +32,14 @@ export class Hero {
 
     addKillNumber() {
         this.killNumber++;
-        if (this.killNumber === 100) {
+        if (this.killNumber >= 100) {
             this.killNumber = 0;
             this.startSpecialMove();
         }
     }
 
     startSpecialMove() {
-        
+
     }
 
     go() {

@@ -18,9 +18,14 @@ export class Enemy {
         this.point.y += 0.5;
     }
 
-    hited(): boolean {
-        this.value--;
-        this.game.score++;
+    hited(n?: number): boolean {
+        if (n) {
+            this.game.score += this.value < n ? this.value : n;
+            this.value -= n;
+        } else {
+            this.value--;
+            this.game.score++;
+        }
 
         if (this.value <= 0) {
             this.game.removeEnemy(this);
