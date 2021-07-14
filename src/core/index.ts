@@ -95,7 +95,7 @@ export class Game {
 
     addEnemy() {
         for (let i = 0; i < 15; i++) {
-            this.enemys.push(new Enemy(Math.ceil(this.step/300*Math.random() + 1), 30 * i + 10, this));
+            this.enemys.push(new Enemy(Math.ceil(this.step/150*Math.random() + 1), 30 * i + 10, this));
         }
     }
 
