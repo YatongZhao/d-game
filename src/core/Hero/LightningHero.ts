@@ -149,7 +149,7 @@ export class LightningHero extends Hero {
     }
 
     startSpecialMove() {
-        this.game.bullets.push(new SpecialLightningBullet(this.game));
+        this.game.bullets.push(new SpecialLightningBullet(this.game, this));
     }
 
     addTarget(chain: Chain<Enemy>): boolean {

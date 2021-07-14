@@ -20,6 +20,8 @@ export class DefaultBullet extends Bullet {
     speed = 30;
     color = 'black';
 
+    isEnd = false;
+
     hero: Hero;
 
     constructor(point: Point, direction: number, game: Game, hero: Hero, {
@@ -52,6 +54,7 @@ export class DefaultBullet extends Bullet {
                             this.hero.addKillNumber();
                         }
                         this.game.removeBullet(this);
+                        this.isEnd = true;
                         return true;
                 }
                 return false;
@@ -71,10 +74,30 @@ export class DefaultBullet extends Bullet {
 
     render(ctx: CanvasRenderingContext2D) {
         let [x, y] = this.point.toNumber();
+
+        // if (this.isEnd) {
+        //     this.game.removeBullet(this);
+        //     let direction = this.direction + ((Math.random() - 0.5) * 0.4 + 1) * Math.PI;
+        //     ctx.beginPath();
+        //     for (let i = 0; i < 4; i++) {
+        //         let random1 = Math.random();
+        //         let random2 = Math.random();
+        //         direction = this.direction + ((Math.random() - 0.5) * 0.4 + 1) * Math.PI;
+        //         ctx.moveTo(x + Math.sin(direction) * this.speed * random1, y - Math.cos(direction) * this.speed * random1);
+        //         ctx.lineTo(x + Math.sin(direction) * this.speed * random2, y - Math.cos(direction) * this.speed * random2);
+        //         let gnt1 = ctx.createLinearGradient(x, y, x + Math.sin(direction) * this.speed, y - Math.cos(direction) * this.speed);
+        //         gnt1.addColorStop(0,this.color);
+        //         gnt1.addColorStop(1,'white');
+        //         ctx.strokeStyle = gnt1;
+        //     }
+        //     ctx.stroke();
+        //     ctx.closePath();
+        //     return;
+        // }
         ctx.beginPath();
         ctx.moveTo(x, y);
         ctx.lineTo(x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
-        var gnt1 = ctx.createLinearGradient(x, y, x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
+        let gnt1 = ctx.createLinearGradient(x, y, x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
         gnt1.addColorStop(0,this.color);
         gnt1.addColorStop(1,'white');
         ctx.strokeStyle = gnt1;
