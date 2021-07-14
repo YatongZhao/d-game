@@ -18,13 +18,15 @@ export class Enemy {
         this.point.y += 0.5;
     }
 
-    hited() {
+    hited(): boolean {
         this.value--;
         this.game.score++;
 
         if (this.value <= 0) {
             this.game.removeEnemy(this);
+            return true;
         }
+        return false;
     }
 
     render(ctx: CanvasRenderingContext2D) {

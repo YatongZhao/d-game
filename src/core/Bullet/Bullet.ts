@@ -1,4 +1,5 @@
 import { Game } from "..";
+import { Hero } from "../Hero/Hero";
 import { Point } from "../Point";
 
 export class Bullet {
@@ -6,15 +7,20 @@ export class Bullet {
     game: Game;
     size = 2;
     direction = 0;
+    speed = 30;
 
-    constructor(point: Point, direction: number, game: Game) {
+    hero: Hero;
+
+    constructor(point: Point, direction: number, game: Game, hero: Hero, speed?: number) {
         this.point = point;
         this.direction = direction;
         this.game = game;
+        this.hero = hero;
+        speed && (this.speed = speed);
     }
 
     go() {
-        for (let i = 0; i <30; i++) {
+        for (let i = 0; i < this.speed * 5; i++) {
             this.point.y -= Math.cos(this.direction);
             this.point.x += Math.sin(this.direction);
 
@@ -23,7 +29,10 @@ export class Bullet {
                     && this.point.y >= enemy.point.y - 2
                     && this.point.x <= enemy.point.x + enemy.size + 2
                     && this.point.y <= enemy.point.y + enemy.size + 2) {
-                        enemy.hited();
+                        let isKilled = enemy.hited();
+                        if (isKilled) {
+                            this.hero.addKillNumber();
+                        }
                         this.game.removeBullet(this);
                         return true;
                 }
@@ -45,8 +54,14 @@ export class Bullet {
     render(ctx: CanvasRenderingContext2D) {
         let [x, y] = this.point.toNumber();
         ctx.beginPath();
-        ctx.arc(x, y, this.size, 0, 2*Math.PI);
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
+        var gnt1 = ctx.createLinearGradient(x, y, x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
+        gnt1.addColorStop(0,'black');
+        gnt1.addColorStop(1,'white');
+        ctx.strokeStyle = gnt1;
+        ctx.stroke();
         ctx.closePath();
-        ctx.fill();
+        ctx.strokeStyle = 'black';
     }
 }

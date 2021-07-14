@@ -21,11 +21,20 @@ export class Hero {
 
     step = 0;
 
+    killNumber = 0;
+
     game: Game;
 
     constructor(game: Game) {
         this.game = game;
         this.point = new Point(0, 0, game.coordinate);
+    }
+
+    addKillNumber() {
+        this.killNumber++;
+        if (this.killNumber === 100) {
+            this.killNumber = 0;
+        }
     }
 
     go() {
@@ -42,6 +51,12 @@ export class Hero {
         ctx.fillStyle = this.color;
         ctx.textAlign = 'center';
         ctx.fillText(`${this.level}`, x + this.size / 2, y + 18);
+        ctx.fillStyle = 'green';
+        ctx.strokeStyle = 'green';
+        drawRoundRect(x + 1, y + this.size + 3, this.killNumber / 100 * (this.size - 2), 2, 1, ctx);
+        ctx.fill();
+        ctx.strokeStyle = 'black';
+        ctx.fillStyle = 'white';
         ctx.fillStyle = 'black';
     }
 

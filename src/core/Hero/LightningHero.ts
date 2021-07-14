@@ -22,12 +22,12 @@ export class LightningHero extends Hero {
     get cycle() {
         switch (this.level) {
             case 1:
-                return 5;
+                return 3;
             case 2:
-                return 4;
+                return 2;
             default:
             case 3:
-                return 3;
+                return 1;
         }
     }
     get _color() {
@@ -96,7 +96,10 @@ export class LightningHero extends Hero {
         if (this.step % this.cycle === 0) {
             let chain = this.targets.chain;
             while (chain) {
-                chain.value.hited();
+                let isKilled = chain.value.hited();
+                if (isKilled) {
+                    this.addKillNumber();
+                }
                 chain = chain.next;
             }
             chain = this.targets.chain;

@@ -164,15 +164,13 @@ export class Game {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeRect(...this.coordinate.origin, this.width, this.height);
 
-        if (this.isMouseDown) {
-            ctx.beginPath();
-            ctx.strokeStyle = 'red';
-            this.heroPosList.forEach(pos => {
-                drawRoundRect(...pos.plus(8, 8).toNumber(), 14, 14, 5, ctx);
-            });
-            ctx.strokeStyle = 'black';
-            ctx.closePath();
-        }
+        ctx.beginPath();
+        ctx.strokeStyle = 'grey';
+        this.heroPosList.forEach(pos => {
+            drawRoundRect(...pos.plus(8, 8).toNumber(), 14, 14, 5, ctx);
+        });
+        ctx.strokeStyle = 'black';
+        ctx.closePath();
 
         ctx.beginPath();
         this.offStageHeros.forEach(hero => {
