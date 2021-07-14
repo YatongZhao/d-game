@@ -1,3 +1,4 @@
+import { SpecialLightningBullet } from '../Bullet/SpecialLightningBullet';
 import { Enemy } from '../Enemy/Enemy';
 import { drawLightning } from '../tool';
 import { Hero } from './Hero';
@@ -145,6 +146,10 @@ export class LightningHero extends Hero {
             p1 = chain.value.point.plus(chain.value.size / 2, chain.value.size / 2);
             chain = chain.next;
         }
+    }
+
+    startSpecialMove() {
+        this.game.bullets.push(new SpecialLightningBullet(this.game));
     }
 
     addTarget(chain: Chain<Enemy>): boolean {

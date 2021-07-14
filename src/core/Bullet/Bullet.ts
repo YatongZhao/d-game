@@ -3,20 +3,38 @@ import { Hero } from "../Hero/Hero";
 import { Point } from "../Point";
 
 export class Bullet {
+    go() {
+
+    }
+
+    render(ctx: CanvasRenderingContext2D) {
+
+    }
+}
+
+export class DefaultBullet extends Bullet {
     point: Point;
     game: Game;
     size = 2;
     direction = 0;
     speed = 30;
+    color = 'black';
 
     hero: Hero;
 
-    constructor(point: Point, direction: number, game: Game, hero: Hero, speed?: number) {
+    constructor(point: Point, direction: number, game: Game, hero: Hero, {
+        speed, color
+    }: {
+        speed?: number;
+        color?: string;
+    }) {
+        super();
         this.point = point;
         this.direction = direction;
         this.game = game;
         this.hero = hero;
         speed && (this.speed = speed);
+        color && (this.color = color);
     }
 
     go() {
@@ -57,7 +75,7 @@ export class Bullet {
         ctx.moveTo(x, y);
         ctx.lineTo(x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
         var gnt1 = ctx.createLinearGradient(x, y, x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
-        gnt1.addColorStop(0,'black');
+        gnt1.addColorStop(0,this.color);
         gnt1.addColorStop(1,'white');
         ctx.strokeStyle = gnt1;
         ctx.stroke();
