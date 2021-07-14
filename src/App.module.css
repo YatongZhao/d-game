@@ -57,11 +57,13 @@
 }
 .shopList {
     display: flex;
+    margin: 5px;
 }
 .shopItem {
     width: fit-content;
     flex-shrink: 0;
-    padding: 0px 20px;
+    padding: 0px 10px;
+    font-size: 14px;
     text-align: center;
     cursor: pointer;
 }
