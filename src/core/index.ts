@@ -201,14 +201,11 @@ export class Game {
     goFighting() {
         let isEnd = this.go();
 
+        this.render();
         if (isEnd) {
             this.setResult('loose');
-            this.renderHP = 0;
-            this.render();
             return;
         }
-        
-        this.render();
 
         if (this.stage[this.stageNumber].isEnd
             && this.bullets.length === 0
@@ -278,7 +275,10 @@ export class Game {
         ctx.fillRect(1, this.targetY - 25, this.width - 2, 10);
         ctx.fillStyle = 'lightgreen';
         ctx.strokeStyle = 'green';
-        const hpWidth = this.renderHP / 1000 * (this.width - 2);
+        const renderHpWidth = this.renderHP / 1000 * (this.width - 2);
+        ctx.fillRect(this.width - renderHpWidth - 1, this.targetY - 25, renderHpWidth, 10);
+        ctx.fillStyle = '#00CC33';
+        const hpWidth = this.HP / 1000 * (this.width - 2);
         ctx.fillRect(this.width - hpWidth - 1, this.targetY - 25, hpWidth, 10);
         ctx.closePath();
         ctx.fillStyle = 'black';
