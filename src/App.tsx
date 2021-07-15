@@ -145,7 +145,7 @@ const App = () => {
             <div>
                 {round === 'strategy' && <button className={s.startFighting} onClick={() => {
                     game.round = 'fighting';
-                }}>结束回合</button>}
+                }}>开始阻击</button>}
             </div>
         </div>
     </>
