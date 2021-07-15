@@ -96,7 +96,6 @@ export class SniperHero extends Hero {
             this.specialTargets.push(this.game.enemys[i as 0]);
         });
 
-        console.log('special', this.specialTargets);
         this.specialDamage = 1;
     }
 

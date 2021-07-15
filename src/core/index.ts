@@ -255,7 +255,7 @@ export class Game {
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.strokeRect(...this.coordinate.origin, this.width, this.height);
 
-        this.stage[this.stageNumber].renderSymbol(ctx);
+        this.stage[this.stageNumber]?.renderSymbol(ctx);
 
         ctx.beginPath();
         ctx.strokeStyle = 'grey';
