@@ -139,7 +139,7 @@ const App = () => {
                 </div>}
             </div>
             <div className={[s.gameEndBox, end ? s.end : ''].join(' ')}>
-                END
+                {game.result === 'win' ? '恭喜🎉' : 'game over'}
                 <button onClick={restart} className={s.restartBtn}>restart</button>
             </div>
             <div>

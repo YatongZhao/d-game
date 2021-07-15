@@ -80,6 +80,7 @@ export class Game {
 
     HP = 1000;
     renderHP = 1000;
+    result: 'win' | 'loose' = 'win';
     private _round: 'strategy' | 'fighting' = 'strategy';
     get round() {
         return this._round;
@@ -199,12 +200,15 @@ export class Game {
 
     goFighting() {
         let isEnd = this.go();
-        this.render();
 
         if (isEnd) {
-            this.setEnd && this.setEnd(true);
+            this.setResult('loose');
+            this.renderHP = 0;
+            this.render();
             return;
         }
+        
+        this.render();
 
         if (this.stage[this.stageNumber].isEnd
             && this.bullets.length === 0
@@ -214,7 +218,7 @@ export class Game {
             this.stageNumber++;
 
             if (this.stageNumber === this.stage.length) {
-                this.setEnd && this.setEnd(true);
+                this.setResult('win');
                 return;
             }
 
@@ -335,6 +339,11 @@ export class Game {
         ctx.fillStyle = 'black';
         ctx.closePath();
 
+    }
+
+    setResult(isWin: 'win' | 'loose') {
+        this.result = isWin;
+        this.setEnd && this.setEnd(true);
     }
 
     addOffStageHero(hero: Hero | null, position?: 0|1|2|3|4|5|6|7|8) {
