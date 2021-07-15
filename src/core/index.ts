@@ -15,6 +15,9 @@ const createStages = (game: Game) => {
         new Round1(game),
         new Round1(game),
         new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
         new Round1(game)
     ];
 }
