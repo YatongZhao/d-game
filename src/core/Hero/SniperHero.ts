@@ -29,12 +29,17 @@ export class SniperHero extends Hero {
         if (!this.target) {
             let maxEnemy: Enemy = this.game.enemys[0];
             this.game.enemys.forEach(enemy => {
-                if (enemy.value > maxEnemy.value) {
+                if (!enemy.isPicked && enemy.value > maxEnemy.value) {
                     maxEnemy = enemy;
                 }
             });
 
+            if (!maxEnemy) {
+                return super.go();
+            }
+
             this.target = maxEnemy;
+            this.target.isPicked = true;
         }
         if (this.step % this.cycle !== 0) return super.go();
 
@@ -51,6 +56,7 @@ export class SniperHero extends Hero {
                 }
             ));
             this.damage = 0;
+            this.target.isPicked = false;
             this.target = null;
         }
 

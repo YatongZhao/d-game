@@ -8,6 +8,8 @@ export class Enemy {
     point: Point;
     game: Game;
 
+    isPicked = false;
+
     constructor(value: number, x: number, game: Game) {
         this.value = value;
         this.game = game;

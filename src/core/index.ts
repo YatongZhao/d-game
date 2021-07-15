@@ -6,9 +6,18 @@ import { Hero } from "./Hero/Hero";
 import { LightningHero } from "./Hero/LightningHero";
 import { SniperHero } from "./Hero/SniperHero";
 import { Point } from "./Point";
+import { Round1 } from "./Round/Round1";
 import { drawRoundRect } from "./tool";
 
 const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(window.navigator.userAgent);
+const createStages = (game: Game) => {
+    return [
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game)
+    ];
+}
 
 export class Game {
     coordinate = new Coordinate(0, 0);
@@ -64,10 +73,28 @@ export class Game {
     cycle = 60;
     step = 0;
     setEnd: React.Dispatch<React.SetStateAction<boolean>> | null = null;
+    setRound: React.Dispatch<React.SetStateAction<'strategy' | 'fighting'>> | null = null;
 
     $ = 300;
     score = 0;
 
+    HP = 1000;
+    renderHP = 1000;
+    private _round: 'strategy' | 'fighting' = 'strategy';
+    get round() {
+        return this._round;
+    }
+    set round(newRound: 'strategy' | 'fighting') {
+        this._round = newRound;
+        if (this.setRound) this.setRound(newRound);
+        if (newRound === 'fighting') {
+            this.goFighting();
+        }
+    }
+    stageNumber = 0;
+    stage = createStages(this);
+
+    isRenderStrategy = false;
 
     isMouseDown = false;
     mouseSelectItem: Hero | null = null;
@@ -76,9 +103,9 @@ export class Game {
     mouseSelectItemPosition: [number, number] = [0, 0];
     mouseSelectItemOffset: [number, number] = [0, 0];
 
-    constructor() {
-        this.go();
+    canvas: HTMLCanvasElement | null = null;
 
+    constructor() {
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleTouchMove = this.handleTouchMove.bind(this);
     }
@@ -91,7 +118,12 @@ export class Game {
         this.step = 0;
         this.$ = 300;
         this.score = 0;
-        this.go();
+        this.HP = 1000;
+
+        this.stageNumber = 0;
+        this.round = 'strategy';
+        this.stage = createStages(this);
+        this.render();
     }
 
     addEnemy() {
@@ -121,8 +153,8 @@ export class Game {
                 this.addOffStageHero(new LightningHero(this));
                 break;
             case 'sniper':
-                if (this.$ < 500) return false;
-                this.$ -= 500;
+                if (this.$ < 200) return false;
+                this.$ -= 200;
                 this.addOffStageHero(new SniperHero(this));
                 break;
             case 'grapeshot':
@@ -132,43 +164,95 @@ export class Game {
                 this.addOffStageHero(new GrapeshotHero(this));
                 break;
         }
+        this.render();
         return true;
     }
 
-    go() {
-        if (this.step % this.cycle === 0) {
-            this.addEnemy();
-        }
+    go(): boolean {
+        this.stage[this.stageNumber].go();
 
         this.enemys.forEach(enemy => {
             enemy.go();
+            if (enemy.point.y >= this.targetY - enemy.size) {
+                this.removeEnemy(enemy);
+                this.HP -= enemy.value > this.HP ? this.HP : enemy.value;
+            }
         });
 
-        // console.log('game go', this.onStageHeros);
         this.onStageHeros.forEach(hero => {
             hero?.go();
         });
-
-        // this.offStageHeros.forEach(hero => {
-        //     hero?.go();
-        // });
 
         this.bullets.forEach(bullet => {
             bullet.go();
         });
 
+        if (this.renderHP > this.HP) {
+            this.renderHP--;
+        } else if (this.renderHP < this.HP) {
+            this.renderHP++
+        }
+
         this.step++;
+        return this.HP <= 0;
     }
 
-    render(canvas: HTMLCanvasElement | null) {
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
+    goFighting() {
+        let isEnd = this.go();
+        this.render();
+
+        if (isEnd) {
+            this.setEnd && this.setEnd(true);
+            return;
+        }
+
+        if (this.stage[this.stageNumber].isEnd
+            && this.bullets.length === 0
+            && this.enemys.length === 0
+            && this.renderHP === this.HP) {
+            this.round = 'strategy';
+            this.stageNumber++;
+
+            if (this.stageNumber === this.stage.length) {
+                this.setEnd && this.setEnd(true);
+                return;
+            }
+
+            this.stage[this.stageNumber].award();
+            return;
+        }
+
+        requestAnimationFrame(() => {
+            this.goFighting();
+        });
+    }
+
+    goStrategy() {
+        if (this.isRenderStrategy) return;
+        this.loopRender();
+    }
+
+    loopRender() {
+        this.render();
+
+        if (!this.isRenderStrategy) {
+            return;
+        }
+        requestAnimationFrame(() => {
+            this.loopRender();
+        });
+    }
+
+    render() {
+        if (!this.canvas) return;
+        const ctx = this.canvas.getContext('2d');
 
         if (!ctx) return;
-        this.go();
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         ctx.strokeRect(...this.coordinate.origin, this.width, this.height);
+
+        this.stage[this.stageNumber].renderSymbol(ctx);
 
         ctx.beginPath();
         ctx.strokeStyle = 'grey';
@@ -177,6 +261,24 @@ export class Game {
         });
         ctx.strokeStyle = 'black';
         ctx.closePath();
+
+        this.enemys.forEach(enemy => {
+            enemy.render(ctx);
+        });
+
+        // HP条
+        ctx.beginPath();
+        ctx.fillStyle = 'white';        
+        ctx.fillRect(1, this.targetY - 30, this.width - 2, 32);
+        ctx.fillStyle = 'lightgrey';
+        ctx.fillRect(1, this.targetY - 25, this.width - 2, 10);
+        ctx.fillStyle = 'lightgreen';
+        ctx.strokeStyle = 'green';
+        const hpWidth = this.renderHP / 1000 * (this.width - 2);
+        ctx.fillRect(this.width - hpWidth - 1, this.targetY - 25, hpWidth, 10);
+        ctx.closePath();
+        ctx.fillStyle = 'black';
+        ctx.strokeStyle = 'black';
 
         ctx.beginPath();
         this.offStageHeros.forEach(hero => {
@@ -188,17 +290,9 @@ export class Game {
         });
         ctx.closePath();
 
-        let isEnd = false;
-        this.enemys.forEach(enemy => {
-            enemy.render(ctx);
-            if (enemy.point.y >= this.targetY - enemy.size) {
-                isEnd = true;
-            }
-        });
-
         ctx.beginPath();
-        ctx.moveTo(...this.targetLineLeft.toNumber());
-        ctx.lineTo(...this.targetLineRight.toNumber());
+        ctx.moveTo(...this.targetLineLeft.plus(0, -30).toNumber());
+        ctx.lineTo(...this.targetLineRight.plus(0, -30).toNumber());
         ctx.stroke();
         ctx.closePath();
 
@@ -241,14 +335,6 @@ export class Game {
         ctx.fillStyle = 'black';
         ctx.closePath();
 
-        if (isEnd) {
-            this.setEnd && this.setEnd(true);
-            return;
-        }
-
-        requestAnimationFrame(() => {
-            this.render(canvas);
-        });
     }
 
     addOffStageHero(hero: Hero | null, position?: 0|1|2|3|4|5|6|7|8) {
@@ -321,17 +407,27 @@ export class Game {
     }
 
     handleCanvasMouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
+        if (this.round === 'fighting') return;
         this.isMouseDown = true;
 
         let isFindOffStage = this.findHero(this.offStageHeros, e.clientX, e.clientY, 'off');
-        let isFindOnStage = this.findHero(this.onStageHeros, e.clientX, e.clientY, 'on');
-
-        if (isFindOffStage || isFindOnStage) {
+        if (isFindOffStage) {
             window.addEventListener('mousemove', this.handleMouseMove);
-        };
+            this.isRenderStrategy = true;
+            this.loopRender();
+            return;
+        }
+        let isFindOnStage = this.findHero(this.onStageHeros, e.clientX, e.clientY, 'on');
+        if (isFindOnStage) {
+            window.addEventListener('mousemove', this.handleMouseMove);
+            this.isRenderStrategy = true;
+            this.loopRender();
+            return;
+        }
     }
 
     handleTouchStart(e: React.TouchEvent<HTMLCanvasElement>) {
+        if (this.round === 'fighting') return;
         e.stopPropagation();
         e.preventDefault();
         this.isMouseDown = true;
@@ -339,11 +435,15 @@ export class Game {
         let isFindOffStage = this.findHero(this.offStageHeros, e.touches[0].clientX, e.touches[0].clientY, 'off');
         if (isFindOffStage) {
             window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+            this.isRenderStrategy = true;
+            this.loopRender();
             return;
         }
         let isFindOnStage = this.findHero(this.onStageHeros, e.touches[0].clientX, e.touches[0].clientY, 'on');
         if (isFindOnStage) {
             window.addEventListener('touchmove', this.handleTouchMove, { passive: false });
+            this.isRenderStrategy = true;
+            this.loopRender();
             return;
         }
     }
@@ -430,6 +530,7 @@ export class Game {
 
         this.isMouseDown = false;
         this.mouseSelectItem = null;
+        this.isRenderStrategy = false;
     }
 
     handleMouseMove(e: MouseEvent) {

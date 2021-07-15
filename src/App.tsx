@@ -19,7 +19,7 @@ const lightning = {
 const sniper = {
     type: 'sniper-hero',
     name: '狙击手',
-    price: 500
+    price: 200
 }
 
 const createProduct = () => {
@@ -50,6 +50,7 @@ const App = () => {
     const [isShopOpen, setIsShopOpen] = useState(false);
     const [productList, setProductList] = useState(createProductList());
     const [showShopError, setShowShopError] = useState(false);
+    const [round, setRound] = useState<'strategy' | 'fighting'>('strategy');
 
     useEffect(() => {
         if (!canvasRef.current) return;
@@ -62,7 +63,12 @@ const App = () => {
     }, [end]);
 
     useEffect(() => {
-        game.render(canvasRef.current);
+        game.setRound = setRound;
+    }, [round]);
+
+    useEffect(() => {
+        game.canvas = canvasRef.current;
+        game.render();
     }, [canvasRef]);
 
     useEffect(() => {
@@ -79,7 +85,8 @@ const App = () => {
     function restart() {
         game.restart();
         setEnd(false);
-        game.render(canvasRef.current);
+        game.canvas = canvasRef.current;
+        // game.goFighting();
     }
 
     return <>
@@ -134,6 +141,11 @@ const App = () => {
             <div className={[s.gameEndBox, end ? s.end : ''].join(' ')}>
                 END
                 <button onClick={restart} className={s.restartBtn}>restart</button>
+            </div>
+            <div>
+                {round === 'strategy' && <button className={s.startFighting} onClick={() => {
+                    game.round = 'fighting';
+                }}>结束回合</button>}
             </div>
         </div>
     </>
