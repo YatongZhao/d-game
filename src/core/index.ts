@@ -204,6 +204,7 @@ export class Game {
         this.render();
         if (isEnd) {
             this.setResult('loose');
+            this.render();
             return;
         }
 
@@ -216,13 +217,14 @@ export class Game {
 
             if (this.stageNumber === this.stage.length) {
                 this.setResult('win');
+                this.render();
                 return;
             }
 
             this.stage[this.stageNumber].award();
+            this.render();
             return;
         }
-
         requestAnimationFrame(() => {
             this.goFighting();
         });
