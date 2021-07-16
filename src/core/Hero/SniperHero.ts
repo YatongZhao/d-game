@@ -88,7 +88,8 @@ export class SniperHero extends Hero {
 
     startSpecialMove() {
         let set = new Set<Enemy>();
-        while (set.size < 12) {
+        let length = this.game.enemySet.length;
+        while (set.size < (length < 12 ? length : 12)) {
             set.add(this.game.enemySet.getRandomEnemy());
         }
 

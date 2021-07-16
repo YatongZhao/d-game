@@ -69,7 +69,7 @@ export class LightningHero extends Hero {
         if (this.targets.length < this.targetMaxLength && this.game.enemySet.length > 0) {
             let smallNum = this.game.enemySet.length >= this.targetMaxLength ? this.targetMaxLength : this.game.enemySet.length;
             let i = smallNum - this.targets.length;
-            while (i !== 0) {
+            while (i > 0) {
                 let chain = this.targets.chain;
 
                 if (!chain) {
