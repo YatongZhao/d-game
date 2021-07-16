@@ -111,6 +111,7 @@ export class SniperHero extends Hero {
     }
 
     renderTarget(ctx: CanvasRenderingContext2D, target: Enemy, radius: number) {
+        if (target.value <= 0) return;
         ctx.strokeStyle = 'red';
         ctx.lineWidth = 3;
         ctx.beginPath();
