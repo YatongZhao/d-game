@@ -1,6 +1,7 @@
 import { Bullet } from "./Bullet/Bullet";
 import { Coordinate } from "./Coordinate";
 import { Enemy } from "./Enemy/Enemy";
+import { EnemySet } from "./Enemy/EnemySet";
 import { GrapeshotHero } from "./Hero/GrapeshotHero";
 import { Hero } from "./Hero/Hero";
 import { LightningHero } from "./Hero/LightningHero";
@@ -25,7 +26,8 @@ const createStages = (game: Game) => {
 export class Game {
     coordinate = new Coordinate(0, 0);
 
-    enemys: Enemy[] = [];
+    // enemys: Enemy[] = [];
+    enemySet = new EnemySet();
 
     offStageHeros: [
         Hero|null, Hero|null, Hero|null,
@@ -115,7 +117,8 @@ export class Game {
     }
 
     restart() {
-        this.enemys = [];
+        // this.enemys = [];
+        this.enemySet.reset();
         this.offStageHeros = [null, null, null, null, null, null, null, null, null];
         this.onStageHeros = [null, null, null, null, null, null, null, null, null];
         this.bullets = [];
@@ -130,12 +133,6 @@ export class Game {
         this.render();
     }
 
-    addEnemy() {
-        for (let i = 0; i < 15; i++) {
-            this.enemys.push(new Enemy(Math.ceil(this.step/150*Math.random() + 1), 30 * i + 10, this));
-        }
-    }
-
     removeBullet(bullet: Bullet) {
         this.bullets = this.bullets.filter(_bullet => {
             return _bullet !== bullet;
@@ -143,9 +140,7 @@ export class Game {
     }
 
     removeEnemy(enemy: Enemy) {
-        this.enemys = this.enemys.filter(_enemy => {
-            return _enemy !== enemy;
-        });
+        this.enemySet.removeEnemy(enemy);
         this.$++;
     }
 
@@ -175,7 +170,7 @@ export class Game {
     go(): boolean {
         this.stage[this.stageNumber].go();
 
-        this.enemys.forEach(enemy => {
+        this.enemySet.forEach(enemy => {
             enemy.go();
             if (enemy.point.y >= this.targetY - enemy.size) {
                 this.removeEnemy(enemy);
@@ -213,7 +208,7 @@ export class Game {
 
         if (this.stage[this.stageNumber].isEnd
             && this.bullets.length === 0
-            && this.enemys.length === 0
+            && this.enemySet.length === 0
             && this.renderHP === this.HP) {
             this.round = 'strategy';
             this.stageNumber++;
@@ -268,7 +263,7 @@ export class Game {
         ctx.strokeStyle = 'black';
         ctx.closePath();
 
-        this.enemys.forEach(enemy => {
+        this.enemySet.forEach(enemy => {
             enemy.render(ctx);
         });
 

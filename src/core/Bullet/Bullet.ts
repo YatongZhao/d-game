@@ -44,23 +44,31 @@ export class DefaultBullet extends Bullet {
             this.point.y -= Math.cos(this.direction);
             this.point.x += Math.sin(this.direction);
 
-            let isTrue = this.game.enemys.some(enemy => {
-                if (this.point.x >= enemy.point.x - 2
-                    && this.point.y >= enemy.point.y - 2
-                    && this.point.x <= enemy.point.x + enemy.size + 2
-                    && this.point.y <= enemy.point.y + enemy.size + 2) {
-                        let isKilled = enemy.hited();
-                        if (isKilled) {
-                            this.hero.addKillNumber();
-                        }
-                        this.game.removeBullet(this);
-                        this.isEnd = true;
-                        return true;
-                }
-                return false;
-            });
+            // let isTrue = this.game.enemySet.some(enemy => {
+            //     if (!enemy) return false;
+            //     if (this.point.x >= enemy.point.x - 2
+            //         && this.point.y >= enemy.point.y - 2
+            //         && this.point.x <= enemy.point.x + enemy.size + 2
+            //         && this.point.y <= enemy.point.y + enemy.size + 2) {
+            //             let isKilled = enemy.hited();
+            //             if (isKilled) {
+            //                 this.hero.addKillNumber();
+            //             }
+            //             this.game.removeBullet(this);
+            //             this.isEnd = true;
+            //             return true;
+            //     }
+            //     return false;
+            // });
 
-            if (isTrue) {
+            let enemy = this.game.enemySet.findEnemyByPoint(this.point);
+            if (enemy) {
+                let isKilled = enemy.hited();
+                if (isKilled) {
+                    this.hero.addKillNumber();
+                }
+                this.game.removeBullet(this);
+                this.isEnd = true;
                 return;
             }
         }

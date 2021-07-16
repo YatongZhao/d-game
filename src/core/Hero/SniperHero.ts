@@ -27,9 +27,9 @@ export class SniperHero extends Hero {
 
     go() {
         if (!this.target) {
-            let maxEnemy: Enemy = this.game.enemys[0];
-            this.game.enemys.forEach(enemy => {
-                if (!enemy.isPicked && enemy.value > maxEnemy.value) {
+            let maxEnemy: Enemy | null = this.game.enemySet.get(0);
+            this.game.enemySet.forEach(enemy => {
+                if (!maxEnemy || (!enemy.isPicked && enemy.value > maxEnemy.value)) {
                     maxEnemy = enemy;
                 }
             });
@@ -87,13 +87,13 @@ export class SniperHero extends Hero {
     }
 
     startSpecialMove() {
-        let set = new Set();
+        let set = new Set<Enemy>();
         while (set.size < 12) {
-            set.add(Math.floor(Math.random() * this.game.enemys.length));
+            set.add(this.game.enemySet.getRandomEnemy());
         }
 
-        set.forEach(i => {
-            this.specialTargets.push(this.game.enemys[i as 0]);
+        set.forEach(enemy => {
+            this.specialTargets.push(enemy);
         });
 
         this.specialDamage = 1;

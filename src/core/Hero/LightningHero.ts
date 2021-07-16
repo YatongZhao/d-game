@@ -66,18 +66,15 @@ export class LightningHero extends Hero {
     }
 
     go() {
-        if (this.targets.length < this.targetMaxLength && this.game.enemys.length > 0) {
-            let smallNum = this.game.enemys.length >= this.targetMaxLength ? this.targetMaxLength : this.game.enemys.length;
+        if (this.targets.length < this.targetMaxLength && this.game.enemySet.length > 0) {
+            let smallNum = this.game.enemySet.length >= this.targetMaxLength ? this.targetMaxLength : this.game.enemySet.length;
             let i = smallNum - this.targets.length;
             while (i !== 0) {
-                let enemyLen = this.game.enemys.length;
-                let randomI = Math.floor(enemyLen*Math.random());
-
                 let chain = this.targets.chain;
 
                 if (!chain) {
                     this.addTarget({
-                        value: this.game.enemys[randomI],
+                        value: this.game.enemySet.getRandomEnemy(),
                         next: null
                     });
                     i--;
@@ -85,7 +82,7 @@ export class LightningHero extends Hero {
                 }
 
                 const isTrue = this.addTarget({
-                    value: this.game.enemys[randomI],
+                    value: this.game.enemySet.getRandomEnemy(),
                     next: null
                 });
                 if (isTrue) {

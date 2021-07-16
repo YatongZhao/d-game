@@ -28,7 +28,7 @@ export class SpecialLightningBullet extends Bullet {
     }
     go() {
         this.y -= this.speed;
-        this.game.enemys.forEach(enemy => {
+        this.game.enemySet.forEach(enemy => {
             if (enemy.point.y <= this.y && enemy.point.y + enemy.size >= this.y) {
                 enemy.hited();
             }

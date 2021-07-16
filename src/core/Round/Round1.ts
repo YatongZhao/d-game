@@ -15,9 +15,11 @@ export class Round1 implements Round {
     }
 
     createEnemy() {
+        let row: Enemy[] = [];
         for (let i = 0; i < 15; i++) {
-            this.game.enemys.push(new Enemy(Math.ceil(this.game.step/150*Math.random() + 1), 30 * i + 10, this.game));
+            row.push(new Enemy(Math.ceil(this.game.step/150*Math.random() + 1), 30 * i + 10, this.game));
         }
+        this.game.enemySet.push(...row);
     }
 
     go() {
