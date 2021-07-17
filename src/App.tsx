@@ -7,7 +7,7 @@ const game = new Game();
 const grapeshot = {
     type: 'grapeshot-hero',
     name: '霰弹',
-    price: 200
+    price: 300
 }
 
 const lightning = {
