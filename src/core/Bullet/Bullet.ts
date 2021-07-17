@@ -19,16 +19,19 @@ export class DefaultBullet extends Bullet {
     direction = 0;
     speed = 30;
     color = 'black';
+    ATK = 1;
 
     isEnd = false;
 
     hero: Hero;
 
     constructor(point: Point, direction: number, game: Game, hero: Hero, {
-        speed, color
+        speed, color, ATK, size
     }: {
         speed?: number;
         color?: string;
+        ATK?: number;
+        size?: number;
     }) {
         super();
         this.point = point;
@@ -37,6 +40,8 @@ export class DefaultBullet extends Bullet {
         this.hero = hero;
         speed && (this.speed = speed);
         color && (this.color = color);
+        ATK && (this.ATK = ATK);
+        size && (this.size = size);
     }
 
     go() {
@@ -44,26 +49,9 @@ export class DefaultBullet extends Bullet {
             this.point.y -= Math.cos(this.direction);
             this.point.x += Math.sin(this.direction);
 
-            // let isTrue = this.game.enemySet.some(enemy => {
-            //     if (!enemy) return false;
-            //     if (this.point.x >= enemy.point.x - 2
-            //         && this.point.y >= enemy.point.y - 2
-            //         && this.point.x <= enemy.point.x + enemy.size + 2
-            //         && this.point.y <= enemy.point.y + enemy.size + 2) {
-            //             let isKilled = enemy.hited();
-            //             if (isKilled) {
-            //                 this.hero.addKillNumber();
-            //             }
-            //             this.game.removeBullet(this);
-            //             this.isEnd = true;
-            //             return true;
-            //     }
-            //     return false;
-            // });
-
             let enemy = this.game.enemySet.findEnemyByPoint(this.point);
             if (enemy) {
-                let isKilled = enemy.hited();
+                let isKilled = enemy.hited(this.ATK);
                 if (isKilled) {
                     this.hero.addKillNumber();
                 }
@@ -108,9 +96,11 @@ export class DefaultBullet extends Bullet {
         let gnt1 = ctx.createLinearGradient(x, y, x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
         gnt1.addColorStop(0,this.color);
         gnt1.addColorStop(1,'white');
+        ctx.lineWidth = this.size;
         ctx.strokeStyle = gnt1;
         ctx.stroke();
         ctx.closePath();
         ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
     }
 }

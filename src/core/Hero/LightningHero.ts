@@ -64,6 +64,17 @@ export class LightningHero extends Hero {
                 return 5;
         }
     }
+    get ATK() {
+        switch (this.level) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            default:
+            case 3:
+                return 3;
+        }
+    }
 
     go() {
         if (this.targets.length < this.targetMaxLength && this.game.enemySet.length > 0) {
@@ -96,7 +107,7 @@ export class LightningHero extends Hero {
             let chain = this.targets.chain;
             while (chain) {
                 if (chain.value.value > 0) {
-                    let isKilled = chain.value.hited();
+                    let isKilled = chain.value.hited(this.ATK);
                     if (isKilled) {
                         this.addKillNumber();
                     }

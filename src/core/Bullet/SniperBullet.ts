@@ -16,6 +16,7 @@ export class SniperBullet extends Bullet {
 
     speed = 30;
     color = 'black';
+    size = 3;
 
     constructor(game: Game, hero: Hero, p1: Point, p2: Point, {
         speed, color, damage
@@ -85,7 +86,7 @@ export class SniperBullet extends Bullet {
         gnt1.addColorStop(0,this.color);
         gnt1.addColorStop(1,'white');
         ctx.strokeStyle = gnt1;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = this.size;
         ctx.stroke();
         ctx.closePath();
         ctx.strokeStyle = 'black';

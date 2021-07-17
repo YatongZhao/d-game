@@ -19,6 +19,12 @@ const createStages = (game: Game) => {
         new Round1(game),
         new Round1(game),
         new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
         new Round1(game)
     ];
 }
@@ -147,19 +153,19 @@ export class Game {
     buyHero(type: 'lightning' | 'grapeshot' | 'sniper'): boolean {
         switch (type) {
             case 'lightning':
-                if (this.$ < 300) return false;
-                this.$ -= 300;
+                if (this.$ < 200) return false;
+                this.$ -= 200;
                 this.addOffStageHero(new LightningHero(this));
                 break;
             case 'sniper':
-                if (this.$ < 200) return false;
-                this.$ -= 200;
+                if (this.$ < 150) return false;
+                this.$ -= 150;
                 this.addOffStageHero(new SniperHero(this));
                 break;
             case 'grapeshot':
             default:
-                if (this.$ < 300) return false;
-                this.$ -= 300;
+                if (this.$ < 200) return false;
+                this.$ -= 200;
                 this.addOffStageHero(new GrapeshotHero(this));
                 break;
         }
@@ -322,23 +328,31 @@ export class Game {
         }
 
         ctx.beginPath();
-        ctx.font = 'bold 24px Arial';
+        ctx.font = 'bold 20px Arial';
         ctx.fillStyle = 'red';
         ctx.textAlign = 'right';
-        ctx.fillText(`$:${this.$}`, 440, 30);
+        ctx.fillText(`$:${this.$}`, 440, 29);
         ctx.font = '12px Arial';
         ctx.fillStyle = 'black';
         ctx.closePath();
 
         ctx.beginPath();
-        ctx.font = 'bold 24px Arial';
+        ctx.font = 'bold 18px Arial';
         ctx.fillStyle = 'red';
         ctx.textAlign = 'left';
-        ctx.fillText(`score:${this.score}`, 20, 30);
+        ctx.fillText(`SCORE:${this.score}`, 20, 29);
         ctx.font = '12px Arial';
         ctx.fillStyle = 'black';
         ctx.closePath();
 
+        ctx.beginPath();
+        ctx.font = '14px Arial';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.fillText(`round ${this.stageNumber + 1} / ${this.stage.length}`, this.width / 2, 28);
+        ctx.font = '12px Arial';
+        ctx.fillStyle = 'black';
+        ctx.closePath();
     }
 
     setResult(isWin: 'win' | 'loose') {

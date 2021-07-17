@@ -15,14 +15,58 @@ export class GrapeshotHero extends Hero {
                 return 1;
         }
     }
+    get bulletNumber() {
+        switch (this.level) {
+            case 1:
+                return 5;
+            case 2:
+                return 6;
+            default:
+            case 3:
+                return 7;
+        }
+    }
+    get ATK() {
+        switch (this.level) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            default:
+            case 3:
+                return 3;
+        }
+    }
+    get bulletSize() {
+        switch (this.level) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            default:
+            case 3:
+                return 3;
+        }
+    }
+    get bulletColor() {
+        switch (this.level) {
+            case 1:
+                return 'black';
+            case 2:
+                return 'blue';
+            default:
+            case 3:
+                return 'red';
+        }
+    }
     color = 'black';
     specialLength = 0;
 
     nullHero = new Hero(this.game);
 
     go() {
-        if (this.step % this.cycle === 0) {
-            for (let i = 0; i < 5; i++) {
+        if (this.step % this.cycle === 0 && this.game.enemySet.length > 0) {
+            for (let i = 0; i < this.bulletNumber; i++) {
                 this.game.bullets.push(
                     new DefaultBullet(
                         this.point.plus(this.size/2, 0),
@@ -31,6 +75,9 @@ export class GrapeshotHero extends Hero {
                         this,
                         {
                             speed: 30 + Math.floor(Math.random() * 30),
+                            color: this.bulletColor,
+                            ATK: this.ATK,
+                            size: this.bulletSize,
                         }
                     )
                 );
@@ -47,7 +94,9 @@ export class GrapeshotHero extends Hero {
                             this.nullHero,
                             {
                                 speed: 30 + Math.floor(Math.random() * 30),
-                                color: 'red',
+                                color: this.bulletColor,
+                                ATK: this.ATK,
+                                size: this.bulletSize,
                             }
                         )
                     );

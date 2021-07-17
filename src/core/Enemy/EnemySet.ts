@@ -61,20 +61,6 @@ export class EnemySet {
     }
 
     findEnemyByPoint(point: Point): Enemy | null {
-
-        // let result: Enemy | null = null;
-        // this.some(enemy => {
-        //     if (!enemy) return false;
-        //     if (point.x >= enemy.point.x - 2
-        //         && point.y >= enemy.point.y - 2
-        //         && point.x <= enemy.point.x + enemy.size + 2
-        //         && point.y <= enemy.point.y + enemy.size + 2) {
-        //             result = enemy;
-        //             return true;
-        //     }
-        //     return false;
-        // });
-        // return result;
         // 30 * i + 10 - 2
         // 30 * i + 10 + enemySize (20) + 2
         // Math.floor((point.x - 10) / 30)
@@ -93,6 +79,27 @@ export class EnemySet {
             }
             return false;
         });
+        return result;
+    }
+
+    findEnemyByY(y: number): Enemy[] {
+        let result: Enemy[] = [];
+        this.matrix.some(row => {
+            let res = false;
+            row.some(enemy => {
+                if (!enemy) return false;
+                if (enemy.point.y + enemy.size < y) {
+                    return true;
+                } else if (enemy.point.y <= y) {
+                    result.push(enemy);
+                    res = true;
+                    return false;
+                }
+                return true;
+            });
+            return res;
+        });
+        
         return result;
     }
 }

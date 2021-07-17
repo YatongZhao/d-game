@@ -19,6 +19,17 @@ export class SpecialLightningBullet extends Bullet {
                 return 1;
         }
     }
+    get ATK() {
+        switch (this.hero.level) {
+            case 1:
+                return 1;
+            case 2:
+                return 2;
+            case 3:
+            default:
+                return 3;
+        }
+    }
 
     constructor(game: Game, hero: LightningHero) {
         super();
@@ -28,10 +39,8 @@ export class SpecialLightningBullet extends Bullet {
     }
     go() {
         this.y -= this.speed;
-        this.game.enemySet.forEach(enemy => {
-            if (enemy.point.y <= this.y && enemy.point.y + enemy.size >= this.y) {
-                enemy.hited();
-            }
+        this.game.enemySet.findEnemyByY(this.y).forEach(enemy => {
+            enemy.hited(this.ATK);
         });
 
         if (this.y <= 0) {

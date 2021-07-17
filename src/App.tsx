@@ -7,19 +7,19 @@ const game = new Game();
 const grapeshot = {
     type: 'grapeshot-hero',
     name: '霰弹',
-    price: 300
+    price: 200
 }
 
 const lightning = {
     type: 'lightning-hero',
     name: '闪电',
-    price: 300
+    price: 200
 }
 
 const sniper = {
     type: 'sniper-hero',
     name: '狙击手',
-    price: 200
+    price: 150
 }
 
 const createProduct = () => {
