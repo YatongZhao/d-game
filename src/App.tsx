@@ -111,7 +111,7 @@ const App = () => {
                 }}>商店</button>
                 {isShopOpen && <div className={s.shopBox}>
                     <div style={{margin: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between'}}>
-                        <span style={{marginLeft: '10px', fontSize: '18px', color: 'gray'}}>童叟无欺，合理消费</span>
+                        <span style={{fontSize: '18px', color: 'gray'}}>童叟无欺，合理消费</span>
                         <button onClick={() => {
                             const isRefreshSuccess = game.refreshHeroList();
                             if (isRefreshSuccess) {
