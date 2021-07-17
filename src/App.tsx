@@ -13,7 +13,7 @@ interface hero {
 const grapeshot: hero = {
     type: 'grapeshot-hero',
     name: '霰弹',
-    price: 300
+    price: 250
 }
 
 const lightning: hero = {

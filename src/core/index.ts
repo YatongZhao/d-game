@@ -171,8 +171,8 @@ export class Game {
                 break;
             case 'grapeshot':
             default:
-                if (this.$ < 300) return false;
-                this.$ -= 300;
+                if (this.$ < 250) return false;
+                this.$ -= 250;
                 this.addOffStageHero(new GrapeshotHero(this));
                 break;
         }
