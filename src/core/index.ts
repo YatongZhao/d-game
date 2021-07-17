@@ -151,8 +151,8 @@ export class Game {
     }
 
     refreshHeroList(): boolean {
-        if (this.$ < 20) return false;
-        this.$ -= 20;
+        if (this.$ < 10) return false;
+        this.$ -= 10;
         this.render();
         return true;
     }

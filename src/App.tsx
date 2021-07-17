@@ -119,7 +119,7 @@ const App = () => {
                             } else {
                                 setShowShopError(true);
                             }
-                        }}>刷新商品<span style={{color: 'red'}}>$20</span></button>
+                        }}>刷新商品<span style={{color: 'red'}}>$10</span></button>
                     </div>
                     <ul className={s.shopList}>
                         {productList.map((p, i) => <li className={s.shopItem} key={i} onClick={() => {
