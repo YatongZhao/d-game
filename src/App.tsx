@@ -4,25 +4,31 @@ import s from './App.module.css';
 
 const game = new Game();
 
-const grapeshot = {
+interface hero {
+    type: 'grapeshot-hero' | 'lightning-hero' | 'sniper-hero';
+    name: string;
+    price: number;
+}
+
+const grapeshot: hero = {
     type: 'grapeshot-hero',
     name: '霰弹',
     price: 300
 }
 
-const lightning = {
+const lightning: hero = {
     type: 'lightning-hero',
     name: '闪电',
     price: 200
 }
 
-const sniper = {
+const sniper: hero = {
     type: 'sniper-hero',
     name: '狙击手',
     price: 150
 }
 
-const createProduct = () => {
+const createProduct: () => hero = () => {
     let r = Math.random();
 
     if (r < 0.33) {
@@ -34,7 +40,7 @@ const createProduct = () => {
     }
 }
 
-const createProductList = () => {
+const createProductList: () => hero[] = () => {
     return [
         createProduct(),
         createProduct(),
@@ -48,7 +54,7 @@ const App = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [end, setEnd] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
-    const [productList, setProductList] = useState(createProductList());
+    const [productList, setProductList] = useState<(hero | null)[]>(createProductList());
     const [showShopError, setShowShopError] = useState(false);
     const [round, setRound] = useState<'strategy' | 'fighting'>('strategy');
 
@@ -104,8 +110,20 @@ const App = () => {
                     setShowShopError(false);
                 }}>商店</button>
                 {isShopOpen && <div className={s.shopBox}>
+                    <div style={{margin: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between'}}>
+                        <span style={{marginLeft: '10px', fontSize: '18px', color: 'gray'}}>童叟无欺，合理消费</span>
+                        <button onClick={() => {
+                            const isRefreshSuccess = game.refreshHeroList();
+                            if (isRefreshSuccess) {
+                                setProductList(createProductList());
+                            } else {
+                                setShowShopError(true);
+                            }
+                        }}>刷新商品<span style={{color: 'red'}}>$20</span></button>
+                    </div>
                     <ul className={s.shopList}>
                         {productList.map((p, i) => <li className={s.shopItem} key={i} onClick={() => {
+                            if (!p) return;
                             let buySuccess = false;
                             switch (p.type) {
                                 case 'grapeshot-hero':
@@ -123,13 +141,15 @@ const App = () => {
                                 setShowShopError(true);
                                 return;
                             }
-                            setIsShopOpen(false);
-                            setProductList(createProductList());
+                            // setIsShopOpen(false);
+                            let newProductList = [...productList];
+                            newProductList[i] = null;
+                            setProductList(newProductList);
                             setShowShopError(false);
                         }}>
-                            {p.name}
+                            {p?.name}
                             <div className={s.shopItemPrice}>
-                                ${p.price}
+                                {p && `$${p.price}`}
                             </div>
                         </li>)}
                     </ul>

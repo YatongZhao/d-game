@@ -150,6 +150,13 @@ export class Game {
         this.$++;
     }
 
+    refreshHeroList(): boolean {
+        if (this.$ < 20) return false;
+        this.$ -= 20;
+        this.render();
+        return true;
+    }
+
     buyHero(type: 'lightning' | 'grapeshot' | 'sniper'): boolean {
         switch (type) {
             case 'lightning':
