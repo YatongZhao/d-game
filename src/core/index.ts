@@ -336,11 +336,15 @@ export class Game {
         ctx.fillStyle = 'black';
         ctx.closePath();
 
+        let displayScore = `${this.score}`;
+        if (this.score > 1000) {
+            displayScore = (this.score / 1000).toFixed(2) + 'k';
+        }
         ctx.beginPath();
         ctx.font = 'bold 18px Arial';
         ctx.fillStyle = 'red';
         ctx.textAlign = 'left';
-        ctx.fillText(`SCORE:${this.score}`, 20, 29);
+        ctx.fillText(`SCORE:${displayScore}`, 20, 29);
         ctx.font = '12px Arial';
         ctx.fillStyle = 'black';
         ctx.closePath();
@@ -349,7 +353,8 @@ export class Game {
         ctx.font = '14px Arial';
         ctx.fillStyle = 'black';
         ctx.textAlign = 'center';
-        ctx.fillText(`round ${this.stageNumber + 1} / ${this.stage.length}`, this.width / 2, 28);
+        ctx.fillText(`round ${this.stageNumber + 1 > this.stage.length
+            ? this.stage.length : this.stageNumber + 1} / ${this.stage.length}`, this.width / 2, 28);
         ctx.font = '12px Arial';
         ctx.fillStyle = 'black';
         ctx.closePath();
