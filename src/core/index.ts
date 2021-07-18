@@ -13,56 +13,67 @@ import { drawRoundRect } from "./tool";
 const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(window.navigator.userAgent);
 const createStages = (game: Game) => {
     return [
+        // 1
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        // 5
         new Round1(game),
         new Round1(game),
         new Round1(game),
         new Round1(game),
         new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
+        // 10
         new Round1(game),
         new Round1(game),
         new Round1(game)
+        // new Round1(game),
+        // new Round1(game),
+        // // 15
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // // 20
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // // 25
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // // 30
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // // 35
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // // 40
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // // 45
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // new Round1(game),
+        // // 50
+        // new Round1(game)
     ];
 }
 
@@ -160,7 +171,6 @@ export class Game {
     }
 
     restart() {
-        // this.enemys = [];
         this.enemySet.reset();
         this.offStageHeros = [null, null, null, null, null, null, null, null, null];
         this.onStageHeros = [null, null, null, null, null, null, null, null, null];

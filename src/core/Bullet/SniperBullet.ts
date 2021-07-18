@@ -1,4 +1,5 @@
 import { Game } from "..";
+import { Enemy } from "../Enemy/Enemy";
 import { Hero } from "../Hero/Hero";
 import { Point } from "../Point";
 import { Bullet } from "./Bullet";
@@ -10,6 +11,7 @@ export class SniperBullet extends Bullet {
     game: Game;
     hero: Hero;
     damage = 0;
+    harmdEnemy = new Set<Enemy>();
 
     sin = 0;
     cos = 0;
@@ -47,22 +49,9 @@ export class SniperBullet extends Bullet {
             this.point.y += -this.cos;
             this.point.x += this.sin;
 
-            // this.game.enemySet.some(enemy => {
-            //     if (!enemy) return false;
-            //     if (this.point.x >= enemy.point.x - 2
-            //         && this.point.y >= enemy.point.y - 2
-            //         && this.point.x <= enemy.point.x + enemy.size + 2
-            //         && this.point.y <= enemy.point.y + enemy.size + 2) {
-            //             let isKilled = enemy.hited(this.damage);
-            //             if (isKilled) {
-            //                 this.hero.addKillNumber();
-            //             }
-            //             return true;
-            //     }
-            //     return false;
-            // });
             let enemy = this.game.enemySet.findEnemyByPoint(this.point);
-            if (enemy) {
+            if (enemy && !this.harmdEnemy.has(enemy)) {
+                this.harmdEnemy.add(enemy);
                 let isKilled = enemy.hited(this.damage);
                 if (isKilled) {
                     this.hero.addKillNumber();

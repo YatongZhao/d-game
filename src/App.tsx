@@ -91,8 +91,8 @@ const App = () => {
     function restart() {
         game.restart();
         setEnd(false);
+        setProductList(createProductList());
         game.canvas = canvasRef.current;
-        // game.goFighting();
     }
 
     return <>

@@ -43,7 +43,8 @@ export class SpecialLightningBullet extends Bullet {
             enemy.hited(this.ATK);
         });
 
-        if (this.y <= 0) {
+        if (this.y <= 0 || (this.game.stage[this.game.stageNumber].isEnd
+            && this.game.enemySet.length === 0)) {
             this.game.removeBullet(this);
         }
     }
