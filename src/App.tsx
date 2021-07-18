@@ -50,11 +50,11 @@ const createProduct: (isFirst?: boolean) => hero = (isFirst) => {
 
 const createProductList: (isFirst?: boolean) => hero[] = (isFirst) => {
     return [
-        createProduct(),
-        createProduct(),
-        createProduct(),
-        createProduct(),
-        createProduct()
+        createProduct(isFirst),
+        createProduct(isFirst),
+        createProduct(isFirst),
+        createProduct(isFirst),
+        createProduct(isFirst)
     ];
 }
 
