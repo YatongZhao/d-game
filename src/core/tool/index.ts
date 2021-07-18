@@ -33,13 +33,13 @@ export const drawLightning = (p1: Point, p2: Point, ctx: CanvasRenderingContext2
     let j = 4 + Math.floor(Math.random() * 5);
 
     ctx.beginPath();
-    ctx.lineWidth = 1 + Math.floor(Math.random()*9);
+    ctx.lineWidth = 1 + Math.floor(Math.random()*6);
     ctx.moveTo(...p1.toNumber());
     for (let i = 1; i < j; i++) {
         let random = Math.random() - 0.5;
         let o = p1.plus(dx / j * (i + random), dy / j * (i + random));
 
-        let randomR = (Math.random() - 0.5) * 60;
+        let randomR = (Math.random() - 0.5) * 40;
         o = o.plus(randomR * sin, randomR * cos);
 
         ctx.lineTo(...o.toNumber());

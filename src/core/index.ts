@@ -9,7 +9,6 @@ import { LightningHero } from "./Hero/LightningHero";
 import { SniperHero } from "./Hero/SniperHero";
 import { Point } from "./Point";
 import { Round1 } from "./Round/Round1";
-import { Round2 } from "./Round/Round2";
 import { drawRoundRect } from "./tool";
 
 const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(window.navigator.userAgent);
