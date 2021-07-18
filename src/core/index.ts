@@ -218,8 +218,8 @@ export class Game {
                 this.addOffStageHero(new SniperHero(this));
                 break;
             case 'boom':
-                if (this.$ < 150) return false;
-                this.$ -= 150;
+                if (this.$ < 120) return false;
+                this.$ -= 120;
                 this.addOffStageHero(new BoomHero(this));
                 break;
             case 'grapeshot':

@@ -31,7 +31,7 @@ const sniper: hero = {
 const boom: hero = {
     type: 'boom-hero',
     name: '爆破手',
-    price: 150
+    price: 120
 }
 
 const createProduct: () => hero = () => {
