@@ -94,4 +94,5 @@
     transform: translateX(-50%);
     font-size: 16px;
     color: gray;
+    z-index: -100;
 }

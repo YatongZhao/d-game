@@ -34,7 +34,7 @@ const boom: hero = {
     price: 120
 }
 
-const createProduct: () => hero = () => {
+const createProduct: (isFirst?: boolean) => hero = (isFirst) => {
     let r = Math.random();
 
     if (r < 0.25) {
@@ -42,13 +42,13 @@ const createProduct: () => hero = () => {
     } else if (r < 0.5) {
         return lightning;
     }  else if (r < 0.75) {
-        return boom;
+        return isFirst ? grapeshot : boom;
     } else {
         return sniper;
     }
 }
 
-const createProductList: () => hero[] = () => {
+const createProductList: (isFirst?: boolean) => hero[] = (isFirst) => {
     return [
         createProduct(),
         createProduct(),
@@ -62,7 +62,7 @@ const App = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [end, setEnd] = useState(false);
     const [isShopOpen, setIsShopOpen] = useState(false);
-    const [productList, setProductList] = useState<(hero | null)[]>(createProductList());
+    const [productList, setProductList] = useState<(hero | null)[]>(createProductList(true));
     const [showShopError, setShowShopError] = useState(false);
     const [round, setRound] = useState<'strategy' | 'fighting'>('strategy');
 
@@ -99,7 +99,7 @@ const App = () => {
     function restart() {
         game.restart();
         setEnd(false);
-        setProductList(createProductList());
+        setProductList(createProductList(true));
         game.canvas = canvasRef.current;
     }
 
