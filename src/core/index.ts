@@ -135,7 +135,7 @@ export class Game {
     setEnd: React.Dispatch<React.SetStateAction<boolean>> | null = null;
     setRound: React.Dispatch<React.SetStateAction<'strategy' | 'fighting'>> | null = null;
 
-    $ = 300;
+    $ = 400;
     score = 0;
 
     HP = 1000;
@@ -177,7 +177,7 @@ export class Game {
         this.onStageHeros = [null, null, null, null, null, null, null, null, null];
         this.bullets = [];
         this.step = 0;
-        this.$ = 300;
+        this.$ = 400;
         this.score = 0;
         this.HP = 1000;
 
