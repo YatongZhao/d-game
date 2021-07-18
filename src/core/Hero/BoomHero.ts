@@ -1,4 +1,3 @@
-import { BoomBullet } from "../Bullet/BoomBullet";
 import { Enemy } from "../Enemy/Enemy";
 import { drawRoundRect } from "../tool";
 import { Hero } from "./Hero";

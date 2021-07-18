@@ -29,12 +29,12 @@ const createStages = (game: Game) => {
         new Round1(game),
         new Round1(game),
         new Round1(game),
-        new Round1(game)
-        // new Round1(game),
+        new Round1(game),
+        new Round1(game),
         // // 15
-        // new Round1(game),
-        // new Round1(game),
-        // new Round1(game),
+        new Round1(game),
+        new Round1(game),
+        new Round1(game),
         // new Round1(game),
         // new Round1(game),
         // // 20
