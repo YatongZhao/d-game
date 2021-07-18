@@ -5,7 +5,7 @@ import s from './App.module.css';
 const game = new Game();
 
 interface hero {
-    type: 'grapeshot-hero' | 'lightning-hero' | 'sniper-hero';
+    type: 'grapeshot-hero' | 'lightning-hero' | 'sniper-hero' | 'boom-hero';
     name: string;
     price: number;
 }
@@ -24,17 +24,25 @@ const lightning: hero = {
 
 const sniper: hero = {
     type: 'sniper-hero',
-    name: '狙击手',
+    name: '狙击',
     price: 150
+}
+
+const boom: hero = {
+    type: 'boom-hero',
+    name: '爆破',
+    price: 200
 }
 
 const createProduct: () => hero = () => {
     let r = Math.random();
 
-    if (r < 0.33) {
+    if (r < 0.25) {
         return grapeshot;
-    } else if (r < 0.66) {
+    } else if (r < 0.5) {
         return lightning;
+    }  else if (r < 0.75) {
+        return boom;
     } else {
         return sniper;
     }
@@ -128,6 +136,9 @@ const App = () => {
                             switch (p.type) {
                                 case 'grapeshot-hero':
                                     buySuccess = game.buyHero('grapeshot');
+                                    break;
+                                case 'boom-hero':
+                                    buySuccess = game.buyHero('boom');
                                     break;
                                 case 'sniper-hero':
                                     buySuccess = game.buyHero('sniper');

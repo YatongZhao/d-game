@@ -34,8 +34,16 @@ export class EnemySet {
         return this.array.some(predicate);
     }
 
+    filter(predicate: ((value: Enemy | null, index: number, array: (Enemy | null)[]) => boolean)) {
+        return this.array.filter(predicate);
+    }
+
     push(...items: Enemy[]) {
-        items.forEach(item => this.set.add(item));
+        items.forEach((item, i) => {
+            item.x = i;
+            item.y = this.matrix.length;
+            this.set.add(item);
+        });
         this.matrix.push(items);
         return this.array.push(...items);
     }
@@ -58,6 +66,50 @@ export class EnemySet {
             i++;
         }
         return result;
+    }
+
+    findEnemysAroundEnemy(enemy: Enemy, r: 1|2|3): Enemy[] {
+        let result = [];
+        switch (r) {
+            case 1:
+                result.push(this.matrix[enemy.y][enemy.x]);
+                result.push(this.matrix[enemy.y][enemy.x - 1]);
+                result.push(this.matrix[enemy.y][enemy.x + 1]);
+                result.push((this.matrix[enemy.y - 1] || [])[enemy.x]);
+                result.push((this.matrix[enemy.y + 1] || [])[enemy.x]);
+                break;
+            case 2:
+            case 3:
+            default:
+                result.push(this.matrix[enemy.y][enemy.x]);
+                result.push(this.matrix[enemy.y][enemy.x - 1]);
+                result.push(this.matrix[enemy.y][enemy.x + 1]);
+                result.push((this.matrix[enemy.y - 1] || [])[enemy.x]);
+                result.push((this.matrix[enemy.y + 1] || [])[enemy.x]);
+                
+                result.push(this.matrix[enemy.y][enemy.x - 2]);
+                result.push(this.matrix[enemy.y][enemy.x + 2]);
+
+                result.push((this.matrix[enemy.y - 2] || [])[enemy.x]);
+                result.push((this.matrix[enemy.y + 2] || [])[enemy.x]);
+
+                result.push((this.matrix[enemy.y - 1] || [])[enemy.x - 1]);
+                result.push((this.matrix[enemy.y + 1] || [])[enemy.x + 1]);
+                result.push((this.matrix[enemy.y - 1] || [])[enemy.x + 1]);
+                result.push((this.matrix[enemy.y + 1] || [])[enemy.x - 1]);
+
+                result.push((this.matrix[enemy.y - 2] || [])[enemy.x - 1]);
+                result.push((this.matrix[enemy.y - 2] || [])[enemy.x + 1]);
+                result.push((this.matrix[enemy.y + 2] || [])[enemy.x - 1]);
+                result.push((this.matrix[enemy.y + 2] || [])[enemy.x + 1]);
+
+                result.push((this.matrix[enemy.y - 1] || [])[enemy.x - 2]);
+                result.push((this.matrix[enemy.y - 1] || [])[enemy.x + 2]);
+                result.push((this.matrix[enemy.y + 1] || [])[enemy.x - 2]);
+                result.push((this.matrix[enemy.y + 1] || [])[enemy.x + 2]);
+                break;
+            }
+        return result.filter(Boolean) as Enemy[];
     }
 
     findEnemyByPoint(point: Point): Enemy | null {

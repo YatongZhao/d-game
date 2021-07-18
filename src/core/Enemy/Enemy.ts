@@ -2,13 +2,25 @@ import { Game } from "..";
 import { Point } from "../Point";
 import { drawRoundRect } from "../tool";
 
+export interface EnemyHook  {
+    go: () => void;
+    render(ctx: CanvasRenderingContext2D, enemy: Enemy): void;
+    beforeDestory: (enemy: Enemy) => void;
+}
+
 export class Enemy {
     value = 0;
     size = 20;
     point: Point;
     game: Game;
+    beforeDestory: ((enemy: Enemy) => void)[] = [];
+    hooks: EnemyHook[] = [];
+
+    x = 0;
+    y = 0;
 
     isPicked = false;
+    isPickedByBoom = false;
 
     constructor(value: number, x: number, game: Game) {
         this.value = value;
@@ -18,6 +30,15 @@ export class Enemy {
 
     go() {
         this.point.y += 0.5;
+        this.hooks.forEach(hook => hook.go());
+    }
+
+    addBeforeDestory(cb: (enemy: Enemy) => void) {
+        this.beforeDestory.push(cb);
+    }
+
+    addHook(hook: EnemyHook) {
+        this.hooks.push(hook);
     }
 
     hited(n?: number): boolean {
@@ -30,16 +51,20 @@ export class Enemy {
         }
 
         if (this.value <= 0) {
+            this.beforeDestory.forEach(cb => cb(this));
             this.game.removeEnemy(this);
+            this.hooks.forEach(hook => hook.beforeDestory(this));
             return true;
         }
         return false;
     }
 
     render(ctx: CanvasRenderingContext2D) {
+        this.hooks.forEach(hook => hook.render(ctx, this));
         let [x, y] = this.point.toNumber();
         drawRoundRect(x, y, this.size, this.size, 5, ctx);
         ctx.textAlign = 'center';
         ctx.fillText(`${this.value}`, x + this.size / 2, y + 13);
     }
+
 }

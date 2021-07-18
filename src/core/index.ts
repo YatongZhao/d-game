@@ -2,6 +2,7 @@ import { Bullet } from "./Bullet/Bullet";
 import { Coordinate } from "./Coordinate";
 import { Enemy } from "./Enemy/Enemy";
 import { EnemySet } from "./Enemy/EnemySet";
+import { BoomHero } from "./Hero/BoomHero";
 import { GrapeshotHero } from "./Hero/GrapeshotHero";
 import { Hero } from "./Hero/Hero";
 import { LightningHero } from "./Hero/LightningHero";
@@ -27,8 +28,8 @@ const createStages = (game: Game) => {
         // 10
         new Round1(game),
         new Round1(game),
+        new Round1(game),
         new Round1(game)
-        // new Round1(game),
         // new Round1(game),
         // // 15
         // new Round1(game),
@@ -204,7 +205,7 @@ export class Game {
         return true;
     }
 
-    buyHero(type: 'lightning' | 'grapeshot' | 'sniper'): boolean {
+    buyHero(type: 'lightning' | 'grapeshot' | 'sniper' | 'boom'): boolean {
         switch (type) {
             case 'lightning':
                 if (this.$ < 200) return false;
@@ -215,6 +216,11 @@ export class Game {
                 if (this.$ < 150) return false;
                 this.$ -= 150;
                 this.addOffStageHero(new SniperHero(this));
+                break;
+            case 'boom':
+                if (this.$ < 200) return false;
+                this.$ -= 200;
+                this.addOffStageHero(new BoomHero(this));
                 break;
             case 'grapeshot':
             default:
