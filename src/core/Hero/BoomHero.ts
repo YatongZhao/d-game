@@ -13,9 +13,9 @@ export class BoomHero extends Hero {
     get cycle() {
         switch (this.level) {
             case 1:
-                return 3;
+                return 5;
             case 2:
-                return 2;
+                return 3;
             default:
             case 3:
                 return 1;
@@ -37,7 +37,7 @@ export class BoomHero extends Hero {
         if (this.step % this.cycle !== 0) return super.go();
 
         if (this.damage < this.target.value) {
-            this.damage += 1;
+            this.damage += this.damage < 1 ? 1 : this.damage;
         } else {
             this.target.addHook(new BoomHook(this.damage, this));
             this.damage = 0;

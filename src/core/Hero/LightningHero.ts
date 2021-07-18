@@ -72,7 +72,7 @@ export class LightningHero extends Hero {
                 return 2;
             default:
             case 3:
-                return 3;
+                return 2;
         }
     }
 
