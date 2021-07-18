@@ -87,3 +87,11 @@
     bottom: calc(100vw / 460 * 180 + 10px);
     right: 10px;
 }
+.tips {
+    position: fixed;
+    bottom: calc(100vw / 460 * 180 + 220px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 16px;
+    color: gray;
+}

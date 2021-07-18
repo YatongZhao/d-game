@@ -179,6 +179,13 @@ const App = () => {
                     setIsShopOpen(false);
                 }}>开始阻击</button>}
             </div>
+            <div>
+                {round === 'strategy' && <div className={s.tips}>
+                    <div>1. 在商店购买武器</div>
+                    <div>2. 将武器拖拽到上排战斗区</div>
+                    <div>3. 点击开始阻击</div>
+                </div>}
+            </div>
         </div>
     </>
 }
