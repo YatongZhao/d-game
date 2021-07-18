@@ -42,7 +42,7 @@ const createProduct: (isFirst?: boolean) => hero = (isFirst) => {
     } else if (r < 0.5) {
         return lightning;
     }  else if (r < 0.75) {
-        return isFirst ? grapeshot : boom;
+        return boom;
     } else {
         return sniper;
     }
