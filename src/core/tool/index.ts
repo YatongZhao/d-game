@@ -24,34 +24,20 @@ export const drawLightning = (p1: Point, p2: Point, ctx: CanvasRenderingContext2
     const cos = dx / l;
     const sin = dy / l;
 
-    ctx.strokeStyle = color || "white";
+    ctx.strokeStyle = color || "red";
 
     ctx.shadowColor = lightColor || 'blue';
-    ctx.shadowBlur = 14;
+    // ctx.shadowBlur = 6;
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-
-
-    ctx.beginPath();
-    ctx.lineWidth = 1;
-    ctx.moveTo(...p1.toNumber());
-    for (let i = 1; i < 5; i++) {
-        let o = p1.plus(dx / 5 * i, dy / 5 * i);
-
-        let randomR = (Math.random() - 0.5) * 60;
-        o = o.plus(randomR * sin, randomR * cos);
-
-        ctx.lineTo(...o.toNumber());
-    }
-    ctx.lineTo(...p2.toNumber());
-    ctx.stroke();
-    ctx.closePath();
+    let j = 4 + Math.floor(Math.random() * 5);
 
     ctx.beginPath();
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1 + Math.floor(Math.random()*9);
     ctx.moveTo(...p1.toNumber());
-    for (let i = 1; i < 5; i++) {
-        let o = p1.plus(dx / 5 * i, dy / 5 * i);
+    for (let i = 1; i < j; i++) {
+        let random = Math.random() - 0.5;
+        let o = p1.plus(dx / j * (i + random), dy / j * (i + random));
 
         let randomR = (Math.random() - 0.5) * 60;
         o = o.plus(randomR * sin, randomR * cos);

@@ -10,16 +10,52 @@ export class BoomHero extends Hero {
     color = 'red';
     nullHero = new Hero(this.game);
     speed = 1;
+    intervalCount = 1;
+    get interval() {
+        switch (this.level) {
+            case 1:
+                return 30;
+            case 2:
+                return 20;
+            default:
+            case 3:
+                return 15;
+        }
+    }
 
     get cycle() {
         switch (this.level) {
             case 1:
-                return 5;
-            case 2:
                 return 3;
+            case 2:
+                return 2;
             default:
             case 3:
                 return 1;
+        }
+    }
+
+    get percent() {
+        switch (this.level) {
+            case 1:
+                return 30;
+            case 2:
+                return 50;
+            default:
+            case 3:
+                return 70;
+        }
+    }
+
+    get _color() {
+        switch (this.level) {
+            case 1:
+                return [153, 0, 0];
+            case 2:
+                return [0, 0, 153];
+            case 3:
+            default:
+                return [0, 0, 0];
         }
     }
 
@@ -35,17 +71,18 @@ export class BoomHero extends Hero {
             this.target = enemy;
             this.target.isPickedByBoom = true;
         }
-        if (this.step % this.cycle !== 0) return super.go();
+        this.intervalCount++;
+        if (this.step % this.cycle !== 0 || this.intervalCount < this.interval) return super.go();
 
         if (this.damage < this.target.value) {
-            this.damage += this.speed;
-            this.speed = this.speed > 10 ? 10 : this.speed;
+            this.damage += this.speed++;
         } else {
-            this.target.addHook(new BoomHook(this.damage, this));
+            this.target.addHook(new BoomHook(Math.ceil(this.damage * this.percent / 100), this));
             this.damage = 0;
             this.target.isPicked = false;
             this.target = null;
             this.speed = 1;
+            this.intervalCount = 1;
         }
 
         super.go();

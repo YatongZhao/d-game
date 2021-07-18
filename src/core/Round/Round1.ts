@@ -7,17 +7,22 @@ export class Round1 implements Round {
     waveNumber = 30;
 
     symbolLife = 100;
+    speed = 0.5;
+    get cycle() {
+        return 30 / this.speed;
+    }
 
     isEnd = false;
 
-    constructor(game: Game) {
+    constructor(game: Game, speed: number) {
         this.game = game;
+        this.speed = speed;
     }
 
     createEnemy() {
         let row: Enemy[] = [];
         for (let i = 0; i < 15; i++) {
-            row.push(new Enemy(Math.ceil(this.game.step/100*Math.random() + 1), 30 * i + 10, this.game));
+            row.push(new Enemy(Math.ceil(this.game.step/110*Math.random() + 1), 30 * i + 10, this.game, this.speed));
         }
         this.game.enemySet.push(...row);
     }
@@ -27,7 +32,7 @@ export class Round1 implements Round {
             this.isEnd = true;
             return;
         }
-        if (this.game.step % this.game.cycle === 0) {
+        if (this.game.step % this.cycle === 0) {
             this.createEnemy();
             this.waveNumber--;
         }

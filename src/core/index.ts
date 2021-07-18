@@ -9,32 +9,33 @@ import { LightningHero } from "./Hero/LightningHero";
 import { SniperHero } from "./Hero/SniperHero";
 import { Point } from "./Point";
 import { Round1 } from "./Round/Round1";
+import { Round2 } from "./Round/Round2";
 import { drawRoundRect } from "./tool";
 
 const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(window.navigator.userAgent);
 const createStages = (game: Game) => {
     return [
         // 1
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
+        new Round1(game, 1),
+        new Round1(game, 1),
+        new Round1(game, 1),
+        new Round1(game, 1),
         // 5
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
+        new Round1(game, 1),
+        new Round1(game, 1),
+        new Round1(game, 1),
+        new Round1(game, 1.5),
+        new Round1(game, 1.5),
         // 10
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
+        new Round1(game, 1.5),
+        new Round1(game, 1.5),
+        new Round1(game, 1.5),
+        new Round1(game, 1.5),
+        new Round1(game, 2),
         // // 15
-        new Round1(game),
-        new Round1(game),
-        new Round1(game),
+        new Round1(game, 2),
+        new Round1(game, 2),
+        new Round1(game, 2),
         // new Round1(game),
         // new Round1(game),
         // // 20
@@ -130,7 +131,6 @@ export class Game {
         new Point(375, this.onStageHeroY, this.coordinate)
     ];
 
-    cycle = 60;
     step = 0;
     setEnd: React.Dispatch<React.SetStateAction<boolean>> | null = null;
     setRound: React.Dispatch<React.SetStateAction<'strategy' | 'fighting'>> | null = null;

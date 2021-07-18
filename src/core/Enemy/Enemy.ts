@@ -15,6 +15,7 @@ export class Enemy {
     game: Game;
     beforeDestory: ((enemy: Enemy) => void)[] = [];
     hooks: EnemyHook[] = [];
+    speed = 0.5;
 
     x = 0;
     y = 0;
@@ -22,14 +23,15 @@ export class Enemy {
     isPicked = false;
     isPickedByBoom = false;
 
-    constructor(value: number, x: number, game: Game) {
+    constructor(value: number, x: number, game: Game, speed?: number) {
         this.value = value;
         this.game = game;
         this.point = new Point(x, -this.size, game.coordinate);
+        speed && (this.speed = speed);
     }
 
     go() {
-        this.point.y += 0.5;
+        this.point.y += this.speed;
         this.hooks.forEach(hook => hook.go());
     }
 

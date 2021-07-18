@@ -1,12 +1,13 @@
 import { Game } from "..";
 import { Enemy } from "../Enemy/Enemy";
+import { BoomHero } from "../Hero/BoomHero";
 import { Hero } from "../Hero/Hero";
 import { Bullet } from "./Bullet";
 
 export class BoomBullet extends Bullet {
     enemy: Enemy;
     game: Game;
-    hero: Hero;
+    hero: BoomHero;
     life = 20;
     isBoomed = false;
     ATK = 0;
@@ -24,7 +25,7 @@ export class BoomBullet extends Bullet {
         }
     }
 
-    constructor(ATK: number, enemy: Enemy, game: Game, hero: Hero, { color }: {
+    constructor(ATK: number, enemy: Enemy, game: Game, hero: BoomHero, { color }: {
         color?: [number, number, number];
     }) {
         super();
@@ -55,7 +56,7 @@ export class BoomBullet extends Bullet {
     render(ctx: CanvasRenderingContext2D) {
         let r = this.life**3 / 1600;
         ctx.beginPath();
-        ctx.fillStyle = `rgba(${this.color || '153, 153, 153'}, ${r/5})`;
+        ctx.fillStyle = `rgba(${this.color || this.hero._color}, ${r/20})`;
         ctx.arc(
             ...this.enemy.point.toNumber(),
             this.boundary - r, 0, 2*Math.PI);

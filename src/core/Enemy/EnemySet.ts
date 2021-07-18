@@ -3,12 +3,14 @@ import { Enemy } from "./Enemy";
 
 export class EnemySet {
     array: (Enemy|null)[] = [];
+    notNullArray: Enemy[] = [];
     matrix: (Enemy|null)[][] = [];
     set: Set<Enemy> = new Set();
 
     reset() {
         this.array = [];
         this.matrix = [];
+        this.notNullArray = [];
         this.set = new Set<Enemy>();
     }
 
@@ -18,12 +20,8 @@ export class EnemySet {
             if (_enemy === enemy) return null;
             return _enemy;
         });
-        this.matrix = this.matrix.map(row => {
-            return row.map(_enemy => {
-                if (_enemy === enemy) return null;
-                return _enemy;
-            })
-        });
+        this.matrix[enemy.y][enemy.x] = null;
+        this.notNullArray = this.notNullArray.filter(_enemy => _enemy !== enemy);
     }
 
     forEach(callbackfn: (value: Enemy, value2: Enemy, set: Set<Enemy>) => void) {
@@ -45,6 +43,7 @@ export class EnemySet {
             this.set.add(item);
         });
         this.matrix.push(items);
+        this.notNullArray.push(...items);
         return this.array.push(...items);
     }
 
@@ -56,16 +55,17 @@ export class EnemySet {
         return this.array[i];
     }
 
+    getNotNull(i: number): Enemy {
+        return this.notNullArray[i];
+    }
+
+    getEnemysByIndex(indexList: number[]): Enemy[] {
+        return indexList.map(i => this.notNullArray[i]);
+    }
+
     getRandomEnemy(): Enemy {
-        let i = 0;
-        let random = Math.floor(Math.random() * this.length);
-        let k = this.set.keys();
-        let result: Enemy = k.next().value;
-        while (i !== random) {
-            result = k.next().value;
-            i++;
-        }
-        return result;
+        let random = Math.floor(Math.random() * this.notNullArray.length);
+        return this.notNullArray[random];
     }
 
     findEnemysAroundEnemy(enemy: Enemy, r: 1|2|3): Enemy[] {
