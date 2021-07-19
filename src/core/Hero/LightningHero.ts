@@ -165,6 +165,7 @@ export class LightningHero extends Hero {
 
     render(ctx: CanvasRenderingContext2D, position?: [number, number]) {
         super.render(ctx, position);
+        if (this.step % 5 !== 0) return;
 
         if (this._targets.size <= 0 || this.game.enemySet.length === 0) return;
         // if (!this.targets.chain) return;
