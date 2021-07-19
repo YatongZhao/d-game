@@ -25,6 +25,18 @@ export class SniperHero extends Hero {
         }
     }
 
+    get percent() {
+        switch (this.level) {
+            case 1:
+                return 100;
+            case 2:
+                return 110;
+            default:
+            case 3:
+                return 120;
+        }
+    }
+
     go() {
         if (!this.target) {
             let maxEnemy: Enemy | null = this.game.enemySet.get(0);
@@ -52,7 +64,7 @@ export class SniperHero extends Hero {
                 this.point.plus(this.size / 2, 0),
                 this.target.point.plus(this.target.size / 2, this.target.size / 2),
                 {
-                    damage: this.damage,
+                    damage: Math.ceil(this.damage * this.percent / 100),
                 }
             ));
             this.damage = 0;
@@ -113,7 +125,7 @@ export class SniperHero extends Hero {
     renderTarget(ctx: CanvasRenderingContext2D, target: Enemy, radius: number) {
         if (target.value <= 0) return;
         ctx.strokeStyle = 'red';
-        ctx.lineWidth = 3;
+        ctx.lineWidth = 2;
         ctx.beginPath();
         ctx.arc(
             ...target.point.plus(target.size / 2, target.size / 2).toNumber(),

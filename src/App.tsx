@@ -118,6 +118,18 @@ const App = () => {
                     setShowShopError(false);
                 }}>商店</button>
                 {isShopOpen && <div className={s.shopBox}>
+                    {round === 'strategy' && <div style={{
+                        color: 'red',
+                        fontSize: '34px',
+                        textAlign: 'right',
+                        margin: '15px',
+                        marginBottom: '5px',
+                        position: 'absolute',
+                        right: '20px',
+                        bottom: '100%'
+                    }}>
+                        $:{game.$}
+                    </div>}
                     <div style={{margin: '10px', marginBottom: '20px', display: 'flex', justifyContent: 'space-between'}}>
                         <span style={{fontSize: '18px', color: 'gray'}}>童叟无欺，合理消费</span>
                         <button onClick={() => {
