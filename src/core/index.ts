@@ -165,7 +165,23 @@ export class Game {
 
     canvas: HTMLCanvasElement | null = null;
 
+    heroPosCanvas: HTMLCanvasElement;
+
     constructor() {
+        this.heroPosCanvas = document.createElement('canvas');
+        this.heroPosCanvas.width = this.width;
+        this.heroPosCanvas.height = 120;
+        const ctx = this.heroPosCanvas.getContext('2d');
+        if (ctx) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'grey';
+            this.heroPosList.forEach(pos => {
+                drawRoundRect(...pos.plus(8, 128 - this.height).toNumber(), 14, 14, 5, ctx);
+            });
+            ctx.strokeStyle = 'black';
+            ctx.closePath();
+        }
+
         this.handleMouseMove = this.handleMouseMove.bind(this);
         this.handleTouchMove = this.handleTouchMove.bind(this);
     }
@@ -316,17 +332,10 @@ export class Game {
         if (!ctx) return;
 
         ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.strokeRect(...this.coordinate.origin, this.width, this.height);
 
         this.stage[this.stageNumber]?.renderSymbol(ctx);
 
-        ctx.beginPath();
-        ctx.strokeStyle = 'grey';
-        this.heroPosList.forEach(pos => {
-            drawRoundRect(...pos.plus(8, 8).toNumber(), 14, 14, 5, ctx);
-        });
-        ctx.strokeStyle = 'black';
-        ctx.closePath();
+        ctx.drawImage(this.heroPosCanvas, 0, this.height - 120);
 
         this.enemySet.forEach(enemy => {
             enemy.render(ctx);
@@ -393,8 +402,6 @@ export class Game {
         ctx.fillStyle = 'red';
         ctx.textAlign = 'right';
         ctx.fillText(`$:${this.$}`, 440, 29);
-        ctx.font = '12px Arial';
-        ctx.fillStyle = 'black';
         ctx.closePath();
 
         let displayScore = `${this.score}`;

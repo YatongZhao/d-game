@@ -24,8 +24,8 @@ export class EnemySet {
         this.notNullArray = this.notNullArray.filter(_enemy => _enemy !== enemy);
     }
 
-    forEach(callbackfn: (value: Enemy, value2: Enemy, set: Set<Enemy>) => void) {
-        this.set.forEach(callbackfn);
+    forEach(callbackfn: (value: Enemy, index: number, array: (Enemy)[]) => void) {
+        this.notNullArray.forEach(callbackfn);
     }
 
     some(predicate: (value: Enemy | null, index: number, array: (Enemy | null)[]) => unknown): boolean {

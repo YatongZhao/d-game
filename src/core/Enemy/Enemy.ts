@@ -8,6 +8,21 @@ export interface EnemyHook  {
     beforeDestory: (enemy: Enemy) => void;
 }
 
+let canvasList = new Array(500);
+canvasList = canvasList.map((_, i) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 20;
+    canvas.height = 20;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+    ctx.beginPath();
+    drawRoundRect(0, 0, 20, 20, 5, ctx);
+    ctx.textAlign = 'center';
+    ctx.fillText(`${i}`, 10, 13);
+    ctx.closePath();
+    return canvas;
+});
+
 export class Enemy {
     value = 0;
     size = 20;
@@ -64,9 +79,13 @@ export class Enemy {
     render(ctx: CanvasRenderingContext2D) {
         this.hooks.forEach(hook => hook.render(ctx, this));
         let [x, y] = this.point.toNumber();
-        drawRoundRect(x, y, this.size, this.size, 5, ctx);
-        ctx.textAlign = 'center';
-        ctx.fillText(`${this.value}`, x + this.size / 2, y + 13);
+        if (canvasList[this.value]) {
+            ctx.drawImage(canvasList[this.value], x, y);
+        } else {
+            drawRoundRect(x, y, this.size, this.size, 5, ctx);
+            ctx.textAlign = 'center';
+            ctx.fillText(`${this.value}`, x + this.size / 2, y + 13);
+        }
     }
 
 }

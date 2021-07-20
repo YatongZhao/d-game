@@ -120,7 +120,8 @@ const App = () => {
                 {isShopOpen && <div className={s.shopBox}>
                     {round === 'strategy' && <div style={{
                         color: 'red',
-                        fontSize: '34px',
+                        fontSize: '46px',
+                        fontWeight: 300,
                         textAlign: 'right',
                         margin: '15px',
                         marginBottom: '5px',

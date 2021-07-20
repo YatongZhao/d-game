@@ -50,6 +50,7 @@ export class SpecialLightningBullet extends Bullet {
     }
 
     render(ctx: CanvasRenderingContext2D) {
+        if (this.game.step % 5 !== 0) return;
         drawLightning(
             new Point(0, this.y, this.game.coordinate),
             new Point(this.game.width, this.y, this.game.coordinate),

@@ -92,8 +92,10 @@ export class DefaultBullet extends Bullet {
         // }
         ctx.beginPath();
         ctx.moveTo(x, y);
-        ctx.lineTo(x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
-        let gnt1 = ctx.createLinearGradient(x, y, x - Math.sin(this.direction) * this.speed, y + Math.cos(this.direction) * this.speed);
+        const dx = Math.round(Math.sin(this.direction) * this.speed);
+        const dy = Math.round(Math.cos(this.direction) * this.speed);
+        ctx.lineTo(x - dx, y + dy);
+        let gnt1 = ctx.createLinearGradient(x, y, x - dx, y + dy);
         gnt1.addColorStop(0,this.color);
         gnt1.addColorStop(1,'white');
         ctx.lineWidth = this.size;
