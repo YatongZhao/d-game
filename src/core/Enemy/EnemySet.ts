@@ -16,10 +16,8 @@ export class EnemySet {
 
     removeEnemy(enemy: Enemy) {
         this.set.delete(enemy);
-        this.array = this.array.map(_enemy => {
-            if (_enemy === enemy) return null;
-            return _enemy;
-        });
+        let index = this.array.findIndex(_enemy => _enemy === enemy);
+        this.array[index] = null;
         this.matrix[enemy.y][enemy.x] = null;
         this.notNullArray = this.notNullArray.filter(_enemy => _enemy !== enemy);
     }
