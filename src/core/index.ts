@@ -140,7 +140,8 @@ export class Game {
 
     HP = 1000;
     renderHP = 1000;
-    result: 'win' | 'loose' = 'win';
+    result: 'win' | 'loose' | 'initial' = 'initial';
+    private _result: 'win' | 'loose' | 'initial' = 'initial';
     private _round: 'strategy' | 'fighting' = 'strategy';
     get round() {
         return this._round;
@@ -185,6 +186,10 @@ export class Game {
             }
         }, db => {
             return this.calcLogic(db);
+        }, () => {
+            if (this._result !== 'initial') {
+                this.setResult(this._result);
+            }
         });
 
         this.handleMouseMove = this.handleMouseMove.bind(this);
@@ -269,95 +274,65 @@ export class Game {
     }
 
     go(): boolean {
-        this.stage[this.stageNumber].go();
+        this.db.exe.block(() => {
+            this.stage[this.stageNumber].go();
+    
+            this.enemySet.forEach(enemy => {
+                enemy.go();
+                if (enemy.point.y >= this.targetY - enemy.size) {
+                    this.removeEnemy(enemy);
+                    this.HP -= enemy.value > this.HP ? this.HP : enemy.value;
+                }
+            });
+        });
+        this.db.exe.block(() => {
+            this.onStageHeros.forEach(hero => {
+                hero?.go();
+            });
 
-        this.enemySet.forEach(enemy => {
-            enemy.go();
-            if (enemy.point.y >= this.targetY - enemy.size) {
-                this.removeEnemy(enemy);
-                this.HP -= enemy.value > this.HP ? this.HP : enemy.value;
+            this.bullets.forEach(bullet => {
+                bullet.go();
+            });
+        });
+        return this.db.exe.block(() => {
+    
+            if (this.renderHP > this.HP) {
+                this.renderHP--;
+            } else if (this.renderHP < this.HP) {
+                this.renderHP++
             }
+    
+            let isLoose = this.HP <= 0;
+    
+            if (isLoose) {
+                this._result = 'loose';
+            }
+    
+            let isWin = this.stage[this.stageNumber].isEnd
+                            && this.bullets.length === 0
+                            && this.enemySet.length === 0
+                            && this.renderHP === this.HP;
+    
+            if (isWin) {
+                this.round = 'strategy';
+                this.stageNumber++;
+    
+                if (this.stageNumber === this.stage.length) {
+                    this._result = 'win';
+                } else {
+                    this.stage[this.stageNumber].award();
+                }
+            }
+    
+            this.step++;
+            return isLoose || isWin;
         });
-
-        this.onStageHeros.forEach(hero => {
-            hero?.go();
-        });
-
-        this.bullets.forEach(bullet => {
-            bullet.go();
-        });
-
-        if (this.renderHP > this.HP) {
-            this.renderHP--;
-        } else if (this.renderHP < this.HP) {
-            this.renderHP++
-        }
-
-        this.step++;
-        return this.HP <= 0;
     }
 
     calcLogic(db: DoubleBuffer): boolean {
         let isEnd = this.go();
-
         this.coreRender(db.headFrame.value);
-        if (isEnd) {
-            this.setResult('loose');
-            this.coreRender(db.headFrame.value);
-            return true;
-        }
-
-        if (this.stage[this.stageNumber].isEnd
-            && this.bullets.length === 0
-            && this.enemySet.length === 0
-            && this.renderHP === this.HP) {
-            this.round = 'strategy';
-            this.stageNumber++;
-
-            if (this.stageNumber === this.stage.length) {
-                this.setResult('win');
-                this.coreRender(db.headFrame.value);
-                return true;
-            }
-
-            this.stage[this.stageNumber].award();
-            this.coreRender(db.headFrame.value);
-            return true;
-        }
-
-        return false;
-    }
-
-    goFighting() {
-        let isEnd = this.go();
-
-        this.render();
-        if (isEnd) {
-            this.setResult('loose');
-            this.render();
-            return;
-        }
-
-        if (this.stage[this.stageNumber].isEnd
-            && this.bullets.length === 0
-            && this.enemySet.length === 0
-            && this.renderHP === this.HP) {
-            this.round = 'strategy';
-            this.stageNumber++;
-
-            if (this.stageNumber === this.stage.length) {
-                this.setResult('win');
-                this.render();
-                return;
-            }
-
-            this.stage[this.stageNumber].award();
-            this.render();
-            return;
-        }
-        requestAnimationFrame(() => {
-            this.goFighting();
-        });
+        return isEnd;
     }
 
     goStrategy() {
@@ -377,105 +352,125 @@ export class Game {
     }
 
     coreRender(canvas: HTMLCanvasElement) {
-        const ctx = canvas.getContext('2d');
+        const ctx = this.db.exe.block(() => canvas.getContext('2d'));
 
-        if (!ctx) return;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        this.stage[this.stageNumber]?.renderSymbol(ctx);
-
-        ctx.drawImage(this.heroPosCanvas, 0, this.height - 120);
-
-        this.enemySet.forEach(enemy => {
-            enemy.render(ctx);
+        this.db.exe.block(() => {
+            if (!ctx) return;
+    
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+            this.stage[this.stageNumber]?.renderSymbol(ctx);
+    
+            ctx.drawImage(this.heroPosCanvas, 0, this.height - 120);
+    
+            this.enemySet.forEach(enemy => {
+                enemy.render(ctx);
+            });
         });
 
-        // HP条
-        ctx.beginPath();
-        ctx.fillStyle = 'white';        
-        ctx.fillRect(1, this.targetY - 30, this.width - 2, 32);
-        ctx.fillStyle = 'grey';
-        ctx.fillRect(1, this.targetY - 25, this.width - 2, 11);
-        ctx.fillStyle = 'lightgreen';
-        ctx.strokeStyle = 'green';
-        const renderHpWidth = this.renderHP / 1000 * (this.width - 2);
-        ctx.fillRect(this.width - renderHpWidth - 1, this.targetY - 25, renderHpWidth, 11);
-        ctx.fillStyle = '#00CC33';
-        const hpWidth = this.HP / 1000 * (this.width - 2);
-        ctx.fillRect(this.width - hpWidth - 1, this.targetY - 25, hpWidth, 11);
-        ctx.fillStyle = 'white';
-        ctx.fillText(`${this.HP}/1000`, this.width /2, this.targetY - 15);
-        ctx.closePath();
-        ctx.fillStyle = 'black';
-        ctx.strokeStyle = 'black';
+        this.db.exe.block(() => {
+            if (!ctx) return;
 
-        ctx.beginPath();
-        this.offStageHeros.forEach(hero => {
-            hero?.render(ctx);
+            // HP条
+            ctx.beginPath();
+            ctx.fillStyle = 'white';        
+            ctx.fillRect(1, this.targetY - 30, this.width - 2, 32);
+            ctx.fillStyle = 'grey';
+            ctx.fillRect(1, this.targetY - 25, this.width - 2, 11);
+            ctx.fillStyle = 'lightgreen';
+            ctx.strokeStyle = 'green';
+            const renderHpWidth = this.renderHP / 1000 * (this.width - 2);
+            ctx.fillRect(this.width - renderHpWidth - 1, this.targetY - 25, renderHpWidth, 11);
+            ctx.fillStyle = '#00CC33';
+            const hpWidth = this.HP / 1000 * (this.width - 2);
+            ctx.fillRect(this.width - hpWidth - 1, this.targetY - 25, hpWidth, 11);
+            ctx.fillStyle = 'white';
+            ctx.fillText(`${this.HP}/1000`, this.width /2, this.targetY - 15);
+            ctx.closePath();
+            ctx.fillStyle = 'black';
+            ctx.strokeStyle = 'black';
+
+            // // 性能监测
+            // ctx.beginPath();
+            // ctx.fillRect(10, 200, (this.db.headNum - this.db.renderNum) * 5, 10);
+
+            // this.db.exe.blockStateList.forEach((item, i) => {
+            //     ctx.fillRect(10, 220 + i * 10, item.consumingTime * 50, 5);
+            // });
+            // ctx.closePath();
+
+            ctx.beginPath();
+            this.offStageHeros.forEach(hero => {
+                hero?.render(ctx);
+            });
+    
+            this.onStageHeros.forEach(hero => {
+                hero?.render(ctx);
+            });
+            ctx.closePath();
+    
+            ctx.beginPath();
+            ctx.moveTo(...this.targetLineLeft.plus(0, -30).toNumber());
+            ctx.lineTo(...this.targetLineRight.plus(0, -30).toNumber());
+            ctx.stroke();
+            ctx.closePath();
         });
+        
+        this.db.exe.block(() => {
+            if (!ctx) return;
 
-        this.onStageHeros.forEach(hero => {
-            hero?.render(ctx);
-        });
-        ctx.closePath();
-
-        ctx.beginPath();
-        ctx.moveTo(...this.targetLineLeft.plus(0, -30).toNumber());
-        ctx.lineTo(...this.targetLineRight.plus(0, -30).toNumber());
-        ctx.stroke();
-        ctx.closePath();
-
-        ctx.beginPath();
-        this.bullets.forEach(bullet => {
-            bullet.render(ctx);
-        });
-        ctx.closePath();
-
-        if (this.mouseSelectItem) {
-            this.mouseSelectItem.render(ctx, [
-                this.mouseSelectItemPosition[0] + this.mouseSelectItemOffset[0],
-                this.mouseSelectItemPosition[1] + this.mouseSelectItemOffset[1],
-            ]);
-            if (isMobile) {
-                ctx.putImageData(ctx.getImageData(
-                    0, this.targetY, this.width, 150
-                ), 0, this.targetY - 150);
-
-                ctx.rect(0, this.targetY - 150, this.width, 150);
-                ctx.stroke();
+            ctx.beginPath();
+            this.bullets.forEach(bullet => {
+                bullet.render(ctx);
+            });
+            ctx.closePath();
+    
+            if (this.mouseSelectItem) {
+                this.mouseSelectItem.render(ctx, [
+                    this.mouseSelectItemPosition[0] + this.mouseSelectItemOffset[0],
+                    this.mouseSelectItemPosition[1] + this.mouseSelectItemOffset[1],
+                ]);
+                if (isMobile) {
+                    ctx.putImageData(ctx.getImageData(
+                        0, this.targetY, this.width, 150
+                    ), 0, this.targetY - 150);
+    
+                    ctx.rect(0, this.targetY - 150, this.width, 150);
+                    ctx.stroke();
+                }
             }
-        }
+    
+            ctx.beginPath();
+            ctx.font = 'bold 20px Arial';
+            ctx.fillStyle = 'red';
+            ctx.textAlign = 'right';
+            ctx.fillText(`$:${this.$}`, 440, 29);
+            ctx.closePath();
+    
+            let displayScore = `${this.score}`;
+            if (this.score > 1000) {
+                displayScore = (this.score / 1000).toFixed(2) + 'k';
+            }
+            ctx.beginPath();
+            ctx.font = 'bold 18px Arial';
+            ctx.fillStyle = 'red';
+            ctx.textAlign = 'left';
+            ctx.fillText(`SCORE:${displayScore}`, 20, 29);
+            ctx.font = '12px Arial';
+            ctx.fillStyle = 'black';
+            ctx.closePath();
+    
+            ctx.beginPath();
+            ctx.font = '14px Arial';
+            ctx.fillStyle = 'black';
+            ctx.textAlign = 'center';
+            ctx.fillText(`round ${this.stageNumber + 1 > this.stage.length
+                ? this.stage.length : this.stageNumber + 1} / ${this.stage.length}`, this.width / 2, 28);
+            ctx.font = '12px Arial';
+            ctx.fillStyle = 'black';
+            ctx.closePath();
+        });
 
-        ctx.beginPath();
-        ctx.font = 'bold 20px Arial';
-        ctx.fillStyle = 'red';
-        ctx.textAlign = 'right';
-        ctx.fillText(`$:${this.$}`, 440, 29);
-        ctx.closePath();
-
-        let displayScore = `${this.score}`;
-        if (this.score > 1000) {
-            displayScore = (this.score / 1000).toFixed(2) + 'k';
-        }
-        ctx.beginPath();
-        ctx.font = 'bold 18px Arial';
-        ctx.fillStyle = 'red';
-        ctx.textAlign = 'left';
-        ctx.fillText(`SCORE:${displayScore}`, 20, 29);
-        ctx.font = '12px Arial';
-        ctx.fillStyle = 'black';
-        ctx.closePath();
-
-        ctx.beginPath();
-        ctx.font = '14px Arial';
-        ctx.fillStyle = 'black';
-        ctx.textAlign = 'center';
-        ctx.fillText(`round ${this.stageNumber + 1 > this.stage.length
-            ? this.stage.length : this.stageNumber + 1} / ${this.stage.length}`, this.width / 2, 28);
-        ctx.font = '12px Arial';
-        ctx.fillStyle = 'black';
-        ctx.closePath();
     }
 
     render() {

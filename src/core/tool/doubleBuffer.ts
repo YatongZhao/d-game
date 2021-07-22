@@ -33,8 +33,11 @@ const port = channel.port2;
 export class DoubleBuffer {
     renderFrame: canvasI;
     headFrame: canvasI;
+    headNum = 0;
+    renderNum = 0;
     drawLogic: (doubleBuffer: DoubleBuffer) => void;
     calcLogic: (doubleBuffer: DoubleBuffer) => boolean;
+    onEnd: () => void;
 
     isEnd = false;
     isFirst = true;
@@ -48,16 +51,23 @@ export class DoubleBuffer {
     constructor({ width, height }: {
         width: number;
         height: number;
-    }, drawLogic: (doubleBuffer: DoubleBuffer) => void, calcLogic: (doubleBuffer: DoubleBuffer) => boolean) {
+    },
+    drawLogic: (doubleBuffer: DoubleBuffer) => void,
+    calcLogic: (doubleBuffer: DoubleBuffer) => boolean,
+    onEnd: () => void) {
         this.drawLogic = drawLogic;
         this.calcLogic = calcLogic;
+        this.onEnd = onEnd;
 
         this.renderFrame = createCanvasList(40, width, height);
         this.headFrame = this.renderFrame;
 
-        channel.port1.onmessage = () => {
+        channel.port1.onmessage = (msg) => {
+            if (this.isEnd || (this.headFrame === this.renderFrame && !this.isFirst)) {
+                return;
+            }
             this.calcStartTime = performance.now();
-            this.exe.start(this.frameTime - (this.calcStartTime - this.frameStartTime));
+            this.exe.start(this.frameTime - (this.calcStartTime - msg.data));
         }
 
         this.exe.entry(() => {
@@ -66,19 +76,20 @@ export class DoubleBuffer {
     }
 
     startLoop() {
-        this.frameStartTime = this.exe.getNow();
-        port.postMessage(undefined);
+        this.exe.start(3000);
     }
 
     private reset() {
         this.isEnd = false;
         this.isFirst = true;
         this.renderFrame = this.headFrame;
+        this.renderNum = this.headNum;
     }
 
     private getNextFrame(): boolean {
         if (this.renderFrame.next !== this.headFrame) {
             this.renderFrame = this.renderFrame.next as canvasI;
+            this.renderNum++;
         } else if (this.isEnd) {
             return true;
         }
@@ -86,34 +97,30 @@ export class DoubleBuffer {
     }
 
     private drawFrame() {
-        // console.log(2);
         this.frameStartTime = performance.now();
         const isEnd = this.getNextFrame();
         this.drawLogic(this);
 
         if (isEnd) {
             this.reset();
+            this.onEnd();
             return;
         }
-        port.postMessage(undefined);
+        port.postMessage(this.frameStartTime);
         requestAnimationFrame(() => {
             this.drawFrame();
         });
     }
 
     private calcHeadFrame() {
+        const isEnd = this.calcLogic(this);
         this.exe.block(() => {
-            if (this.isEnd) {
-                this.exe.stop();
-                return;
-            }
-            // console.log(1);
-            const isEnd = this.calcLogic(this);
             if (isEnd) {
                 this.isEnd = true;
                 this.exe.stop();
             }
             this.headFrame = this.headFrame.next as canvasI;
+            this.headNum++;
             if (this.headFrame === this.renderFrame) {
                 this.exe.stop();
             }

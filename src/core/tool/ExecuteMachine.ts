@@ -6,10 +6,11 @@ interface blockState {
 export class ExecuteMachine {
     private remainingTime;
     private defaultRemainingTime;
-    private blockStateList: blockState[] = [];
+    blockStateList: blockState[] = [];
     private executeStep = 0;
     private memoStep = 0;
     private isExecutingToTheEnd = true;
+    private isInTheEnv = false;
     private starter: () => void = () => {
         throw new Error("need a starter.");
     };
@@ -48,18 +49,23 @@ export class ExecuteMachine {
 
     start(remainingTime?: number) {
         if (this.isExecuting) return;
+        this.isInTheEnv = true;
         this.remainingTime = remainingTime || this.defaultRemainingTime;
         this.executingStartTime = this.getNow();
         this.isExecuting = true;
         while (this.isExecuting) {
             this.starter();
         }
+        this.isInTheEnv = false;
     }
 
     block<T>(callback: () => T): T {
+        if (!this.isInTheEnv) {
+            return callback();
+        }
         if (!this.isExecuting) {
             this.isExecutingToTheEnd = false;
-            return {} as T;
+            return null as unknown as T;
         }
         let result: T;
         if (this.executeStep < this.memoStep) {
@@ -80,6 +86,7 @@ export class ExecuteMachine {
         this.executeStep++;
         
         if (this.getNow() - this.executingStartTime >= this.remainingTime) {
+            console.log(this.getNow() - this.executingStartTime, this.remainingTime);
             this.isExecuting = false;
         }
         return result;

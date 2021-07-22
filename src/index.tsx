@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import VConsole from 'vconsole';
+
+// const vConsole = new VConsole({ maxLogNumber: 50 });
 
 ReactDOM.render(
   <React.StrictMode>
