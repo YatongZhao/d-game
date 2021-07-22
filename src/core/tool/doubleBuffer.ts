@@ -64,6 +64,10 @@ export class DoubleBuffer {
         this.calcHeadFrame(this.drawFrame.bind(this));
     }
 
+    isRemainingTimeEnough() {
+        return performance.now() - this.calcStartTime < this.remainingTime - 4;
+    }
+
     private reset() {
         this.remainingTime = 16;
         this.isEnd = false;
@@ -93,10 +97,6 @@ export class DoubleBuffer {
             this.frameStartTime = performance.now();
             this.drawFrame();
         });
-    }
-
-    isRemainingTimeEnough() {
-        return performance.now() - this.calcStartTime < this.remainingTime - 4;
     }
     
     private calcHeadFrame(callback?: Function) {
