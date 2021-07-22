@@ -1,3 +1,5 @@
+import { ExecuteMachine } from "./ExecuteMachine";
+
 interface canvasI {
     value: HTMLCanvasElement;
     next: canvasI|null;
@@ -31,62 +33,63 @@ const port = channel.port2;
 export class DoubleBuffer {
     renderFrame: canvasI;
     headFrame: canvasI;
-    draw: (doubleBuffer: DoubleBuffer) => void;
-    calc: (doubleBuffer: DoubleBuffer) => { isEnd: boolean; isPaused: boolean; };
-    isCalcLoopPaused = false;
+    drawLogic: (doubleBuffer: DoubleBuffer) => void;
+    calcLogic: (doubleBuffer: DoubleBuffer) => boolean;
 
     isEnd = false;
+    isFirst = true;
 
     frameStartTime = performance.now();
-    remainingTime = 16;
+    calcStartTime = 0;
     frameTime = 16;
 
-    calcStartTime = 0;
+    exe = new ExecuteMachine();
 
     constructor({ width, height }: {
         width: number;
         height: number;
-    }, draw: (doubleBuffer: DoubleBuffer) => void, calc: (doubleBuffer: DoubleBuffer) => {
-        isEnd: boolean; isPaused: boolean;
-    }) {
-        this.draw = draw;
-        this.calc = calc;
+    }, drawLogic: (doubleBuffer: DoubleBuffer) => void, calcLogic: (doubleBuffer: DoubleBuffer) => boolean) {
+        this.drawLogic = drawLogic;
+        this.calcLogic = calcLogic;
 
         this.renderFrame = createCanvasList(40, width, height);
         this.headFrame = this.renderFrame;
 
         channel.port1.onmessage = () => {
-            this.calcHeadFrame();
+            this.calcStartTime = performance.now();
+            this.exe.start(this.frameTime - (this.calcStartTime - this.frameStartTime));
         }
+
+        this.exe.entry(() => {
+            this.calcHeadFrame();
+        });
     }
 
     startLoop() {
-        this.calcHeadFrame(this.drawFrame.bind(this));
-    }
-
-    isRemainingTimeEnough() {
-        return performance.now() - this.calcStartTime < this.remainingTime - 4;
+        this.frameStartTime = this.exe.getNow();
+        port.postMessage(undefined);
     }
 
     private reset() {
-        this.remainingTime = 16;
         this.isEnd = false;
-        this.isCalcLoopPaused = false;
+        this.isFirst = true;
+        this.renderFrame = this.headFrame;
     }
 
     private getNextFrame(): boolean {
         if (this.renderFrame.next !== this.headFrame) {
             this.renderFrame = this.renderFrame.next as canvasI;
         } else if (this.isEnd) {
-            this.renderFrame = this.renderFrame.next as canvasI;
             return true;
         }
         return false;
     }
 
     private drawFrame() {
+        // console.log(2);
+        this.frameStartTime = performance.now();
         const isEnd = this.getNextFrame();
-        this.draw(this);
+        this.drawLogic(this);
 
         if (isEnd) {
             this.reset();
@@ -94,38 +97,33 @@ export class DoubleBuffer {
         }
         port.postMessage(undefined);
         requestAnimationFrame(() => {
-            this.frameStartTime = performance.now();
             this.drawFrame();
         });
     }
-    
-    private calcHeadFrame(callback?: Function) {
-        if (callback) {
-            this.frameStartTime = performance.now();
-        }
-        this.calcStartTime = performance.now();
-        this.remainingTime = this.frameTime - (this.calcStartTime - this.frameStartTime);
-        if (this.isEnd) return;
-        const { isEnd, isPaused } = this.calc(this);
-        if (callback) {
-            requestAnimationFrame(() => {
-                callback();
-            });
-        }
-        if (isPaused) {
-            return;
-        }
-        if (isEnd) {
-            this.isEnd = true;
-            return;
-        }
-        this.headFrame = this.headFrame.next as canvasI;
-        if (this.headFrame === this.renderFrame) {
-            return;
-        }
-        if (!this.isRemainingTimeEnough()) {
-            return;
-        }
-        this.calcHeadFrame();
+
+    private calcHeadFrame() {
+        this.exe.block(() => {
+            if (this.isEnd) {
+                this.exe.stop();
+                return;
+            }
+            // console.log(1);
+            const isEnd = this.calcLogic(this);
+            if (isEnd) {
+                this.isEnd = true;
+                this.exe.stop();
+            }
+            this.headFrame = this.headFrame.next as canvasI;
+            if (this.headFrame === this.renderFrame) {
+                this.exe.stop();
+            }
+            if (this.isFirst) {
+                this.isFirst = false;
+                requestAnimationFrame(() => {
+                    this.drawFrame();
+                });
+                this.exe.stop();
+            }
+        });
     }
 }

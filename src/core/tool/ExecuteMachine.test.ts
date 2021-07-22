@@ -22,6 +22,20 @@ test('execute machine: loop时间正常', () => {
     expect(end - start < 10).toBe(true);
 });
 
+test('execute machine: starter判空正常', () => {
+    let exe = new ExecuteMachine(3);
+    let error: Error = new Error();
+    try {
+        let start = performance.now();
+        exe.start();
+        let end = performance.now();
+        expect(end - start < 1).toBe(true);
+    } catch (_error) {
+        error = _error;
+    }
+    expect(error.message).toBe('need a starter.');
+});
+
 let exe = new ExecuteMachine(3);
 let counter = 0;
 let memoA = 0;
@@ -67,6 +81,5 @@ test('execute machine: 停止2正常', () => {
 test('execute machine: 重启2正常', () => {
     exe.start();
 });
-
 
 export {};

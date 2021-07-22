@@ -10,6 +10,7 @@ import { SniperHero } from "./Hero/SniperHero";
 import { Point } from "./Point";
 import { Round1 } from "./Round/Round1";
 import { drawRoundRect } from "./tool";
+import { DoubleBuffer } from "./tool/doubleBuffer";
 
 const isMobile = /Android|webOS|iPhone|iPod|BlackBerry/i.test(window.navigator.userAgent);
 const createStages = (game: Game) => {
@@ -148,7 +149,8 @@ export class Game {
         this._round = newRound;
         if (this.setRound) this.setRound(newRound);
         if (newRound === 'fighting') {
-            this.goFighting();
+            // this.goFighting();
+            this.db.startLoop();
         }
     }
     stageNumber = 0;
@@ -166,9 +168,30 @@ export class Game {
     canvas: HTMLCanvasElement | null = null;
 
     heroPosCanvas: HTMLCanvasElement;
+    db: DoubleBuffer;
 
     constructor() {
         this.heroPosCanvas = document.createElement('canvas');
+        this.initHeroPosCanvas();
+
+        this.db = new DoubleBuffer({
+            width: this.width, height: this.height
+        }, db => {
+            if (!this.canvas) return;
+            const ctx = this.canvas.getContext('2d');
+            if (ctx) {
+                ctx.clearRect(0, 0, this.width, this.height);
+                ctx.drawImage(db.renderFrame.value, 0, 0);
+            }
+        }, db => {
+            return this.calcLogic(db);
+        });
+
+        this.handleMouseMove = this.handleMouseMove.bind(this);
+        this.handleTouchMove = this.handleTouchMove.bind(this);
+    }
+
+    private initHeroPosCanvas() {
         this.heroPosCanvas.width = this.width;
         this.heroPosCanvas.height = 120;
         const ctx = this.heroPosCanvas.getContext('2d');
@@ -181,9 +204,6 @@ export class Game {
             ctx.strokeStyle = 'black';
             ctx.closePath();
         }
-
-        this.handleMouseMove = this.handleMouseMove.bind(this);
-        this.handleTouchMove = this.handleTouchMove.bind(this);
     }
 
     restart() {
@@ -277,6 +297,37 @@ export class Game {
         return this.HP <= 0;
     }
 
+    calcLogic(db: DoubleBuffer): boolean {
+        let isEnd = this.go();
+
+        this.coreRender(db.headFrame.value);
+        if (isEnd) {
+            this.setResult('loose');
+            this.coreRender(db.headFrame.value);
+            return true;
+        }
+
+        if (this.stage[this.stageNumber].isEnd
+            && this.bullets.length === 0
+            && this.enemySet.length === 0
+            && this.renderHP === this.HP) {
+            this.round = 'strategy';
+            this.stageNumber++;
+
+            if (this.stageNumber === this.stage.length) {
+                this.setResult('win');
+                this.coreRender(db.headFrame.value);
+                return true;
+            }
+
+            this.stage[this.stageNumber].award();
+            this.coreRender(db.headFrame.value);
+            return true;
+        }
+
+        return false;
+    }
+
     goFighting() {
         let isEnd = this.go();
 
@@ -325,13 +376,12 @@ export class Game {
         });
     }
 
-    render() {
-        if (!this.canvas) return;
-        const ctx = this.canvas.getContext('2d');
+    coreRender(canvas: HTMLCanvasElement) {
+        const ctx = canvas.getContext('2d');
 
         if (!ctx) return;
 
-        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
         this.stage[this.stageNumber]?.renderSymbol(ctx);
 
@@ -426,6 +476,11 @@ export class Game {
         ctx.font = '12px Arial';
         ctx.fillStyle = 'black';
         ctx.closePath();
+    }
+
+    render() {
+        if (!this.canvas) return;
+        this.coreRender(this.canvas);
     }
 
     setResult(isWin: 'win' | 'loose') {

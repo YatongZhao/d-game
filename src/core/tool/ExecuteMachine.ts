@@ -5,20 +5,21 @@ interface blockState {
 
 export class ExecuteMachine {
     private remainingTime;
+    private defaultRemainingTime;
     private blockStateList: blockState[] = [];
     private executeStep = 0;
     private memoStep = 0;
     private isExecutingToTheEnd = true;
-    private starter: () => void = () => {};
+    private starter: () => void = () => {
+        throw new Error("need a starter.");
+    };
+    ;
     private isExecuting = false;
     private executingStartTime = this.getNow();
 
-    constructor(remainingTime: number = 16) {
-        this.remainingTime = remainingTime;
-    }
-
-    private getNow(): number {
-        return performance.now();
+    constructor(defaultRemainingTime: number = 16) {
+        this.defaultRemainingTime = defaultRemainingTime;
+        this.remainingTime = defaultRemainingTime;
     }
 
     private resetState() {
@@ -27,6 +28,10 @@ export class ExecuteMachine {
         this.blockStateList = [];
         this.isExecutingToTheEnd = true;
         this.isExecuting = false;
+    }
+
+    getNow(): number {
+        return performance.now();
     }
 
     entry(logic: () => void): void {
@@ -41,8 +46,9 @@ export class ExecuteMachine {
         this.resetState();
     }
 
-    start() {
+    start(remainingTime?: number) {
         if (this.isExecuting) return;
+        this.remainingTime = remainingTime || this.defaultRemainingTime;
         this.executingStartTime = this.getNow();
         this.isExecuting = true;
         while (this.isExecuting) {
