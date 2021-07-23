@@ -6,7 +6,7 @@ interface blockState {
 export class ExecuteMachine {
     private remainingTime;
     private defaultRemainingTime;
-    blockStateList: blockState[] = [];
+    private blockStateList: (blockState|null)[] = [];
     private executeStep = 0;
     private memoStep = 0;
     private isExecutingToTheEnd = true;
@@ -14,7 +14,7 @@ export class ExecuteMachine {
     private starter: () => void = () => {
         throw new Error("need a starter.");
     };
-    ;
+    private endLogic: () => void = () => {};
     private isExecuting = false;
     private executingStartTime = this.getNow();
 
@@ -42,9 +42,15 @@ export class ExecuteMachine {
             this.executeStep = 0;
             if (this.isExecutingToTheEnd) {
                 this.memoStep = 0;
+                this.blockStateList.fill(null);
+                this.endLogic();
             }
         };
         this.resetState();
+    }
+
+    end(endLogic: () => void) {
+        this.endLogic = endLogic;
     }
 
     start(remainingTime?: number) {
@@ -56,6 +62,9 @@ export class ExecuteMachine {
         while (this.isExecuting) {
             this.starter();
         }
+        if (this.isExecutingToTheEnd) {
+            this.blockStateList.fill(null);
+        }
         this.isInTheEnv = false;
     }
 
@@ -63,13 +72,16 @@ export class ExecuteMachine {
         if (!this.isInTheEnv) {
             return callback();
         }
+        if (this.getNow() - this.executingStartTime >= this.remainingTime) {
+            this.isExecuting = false;
+        }
         if (!this.isExecuting) {
             this.isExecutingToTheEnd = false;
             return null as unknown as T;
         }
         let result: T;
         if (this.executeStep < this.memoStep) {
-            result = this.blockStateList[this.executeStep].result;
+            result = (this.blockStateList[this.executeStep] as blockState).result;
         } else {
             const start = this.getNow();
             result = callback();
@@ -79,16 +91,11 @@ export class ExecuteMachine {
                 result,
                 consumingTime,
             };
-
             this.memoStep++;
         }
 
         this.executeStep++;
         
-        if (this.getNow() - this.executingStartTime >= this.remainingTime) {
-            console.log(this.getNow() - this.executingStartTime, this.remainingTime);
-            this.isExecuting = false;
-        }
         return result;
     }
 

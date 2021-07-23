@@ -97,6 +97,7 @@ export class Game {
     ] = [null, null, null, null, null, null, null, null, null];
 
     bullets: Bullet[] = [];
+    preBullets: Bullet[] = [];
 
     width = 460;
     height = window.innerHeight * 460 / window.innerWidth;
@@ -177,18 +178,21 @@ export class Game {
 
         this.db = new DoubleBuffer({
             width: this.width, height: this.height
-        }, db => {
+        },
+        db => {
             if (!this.canvas) return;
             const ctx = this.canvas.getContext('2d');
             if (ctx) {
                 ctx.clearRect(0, 0, this.width, this.height);
                 ctx.drawImage(db.renderFrame.value, 0, 0);
             }
-        }, db => {
-            return this.calcLogic(db);
-        }, () => {
+        },
+        db => this.calcLogic(db),
+        () => this.flushBullet(),
+        () => {
             if (this._result !== 'initial') {
                 this.setResult(this._result);
+                this._result = 'initial';
             }
         });
 
@@ -227,10 +231,18 @@ export class Game {
         this.render();
     }
 
-    removeBullet(bullet: Bullet) {
-        this.bullets = this.bullets.filter(_bullet => {
-            return _bullet !== bullet;
-        });
+    removeBullet() {
+        this.bullets = this.bullets.filter(bullet => !bullet.isDirty);
+    }
+
+    pushBullet(bullet: Bullet) {
+        this.preBullets.push(bullet);
+    }
+
+    flushBullet() {
+        this.removeBullet();
+        this.bullets = this.bullets.concat(this.preBullets);
+        this.preBullets = [];
     }
 
     removeEnemy(enemy: Enemy) {
@@ -289,11 +301,12 @@ export class Game {
             this.onStageHeros.forEach(hero => {
                 hero?.go();
             });
-
-            this.bullets.forEach(bullet => {
-                bullet.go();
-            });
         });
+
+        this.bullets.forEach(bullet => {
+            this.db.exe.block(() => bullet.go());
+        });
+
         return this.db.exe.block(() => {
     
             if (this.renderHP > this.HP) {
@@ -316,7 +329,6 @@ export class Game {
             if (isWin) {
                 this.round = 'strategy';
                 this.stageNumber++;
-    
                 if (this.stageNumber === this.stage.length) {
                     this._result = 'win';
                 } else {
@@ -363,7 +375,10 @@ export class Game {
     
             ctx.drawImage(this.heroPosCanvas, 0, this.height - 120);
     
+        });
+        this.db.exe.block(() => {
             this.enemySet.forEach(enemy => {
+                if (!ctx) return;
                 enemy.render(ctx);
             });
         });
@@ -389,15 +404,24 @@ export class Game {
             ctx.closePath();
             ctx.fillStyle = 'black';
             ctx.strokeStyle = 'black';
+        });
 
-            // // 性能监测
-            // ctx.beginPath();
-            // ctx.fillRect(10, 200, (this.db.headNum - this.db.renderNum) * 5, 10);
+        // this.db.exe.block(() => {
+        //     if (!ctx) return;
 
-            // this.db.exe.blockStateList.forEach((item, i) => {
-            //     ctx.fillRect(10, 220 + i * 10, item.consumingTime * 50, 5);
-            // });
-            // ctx.closePath();
+        //     // 性能监测
+        //     ctx.beginPath();
+        //     ctx.fillRect(10, 200, (this.db.headNum - this.db.renderNum) * 1, 10);
+            
+        //     this.db.exe.blockStateList.forEach((item, i) => {
+        //         ctx.fillRect(10, 220 + i * 10, (item?.consumingTime || 0) * 50, 5);
+        //         ctx.fillText(`${i}`, 5, 220 + i * 10 + 7);
+        //     });
+        //     ctx.closePath();
+        // });
+
+        this.db.exe.block(() => {
+            if (!ctx) return;
 
             ctx.beginPath();
             this.offStageHeros.forEach(hero => {

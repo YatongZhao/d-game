@@ -45,6 +45,7 @@ export class SniperBullet extends Bullet {
     }
 
     go() {
+        if (this.isDirty) return;
         for (let i = 0; i < this.speed * 5; i++) {
             this.point.y += -this.cos;
             this.point.x += this.sin;
@@ -62,7 +63,7 @@ export class SniperBullet extends Bullet {
             || this.point.y > this.game.height
             || this.point.x < 0
             || this.point.x > this.game.width) {
-            this.game.removeBullet(this);
+            this.isDirty = true;
         }
     }
 

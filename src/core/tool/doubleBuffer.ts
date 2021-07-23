@@ -3,12 +3,14 @@ import { ExecuteMachine } from "./ExecuteMachine";
 interface canvasI {
     value: HTMLCanvasElement;
     next: canvasI|null;
+    isReady: boolean;
 }
 
 const createCanvasList = (len: number, width: number, height: number): canvasI => {
     let start: canvasI = {
         value: document.createElement('canvas'),
-        next: null
+        next: null,
+        isReady: false,
     }
     start.value.width = width;
     start.value.height = height;
@@ -16,6 +18,7 @@ const createCanvasList = (len: number, width: number, height: number): canvasI =
     for (let i = 0; i < len - 1; i++) {
         current.next = {
             value: document.createElement('canvas'),
+            isReady: false,
             next: null
         }
         current.next.value.width = width;
@@ -42,9 +45,11 @@ export class DoubleBuffer {
     isEnd = false;
     isFirst = true;
 
+    shouldGo = false;
+
     frameStartTime = performance.now();
     calcStartTime = 0;
-    frameTime = 16;
+    frameTime = 12;
 
     exe = new ExecuteMachine();
 
@@ -54,28 +59,34 @@ export class DoubleBuffer {
     },
     drawLogic: (doubleBuffer: DoubleBuffer) => void,
     calcLogic: (doubleBuffer: DoubleBuffer) => boolean,
+    endLogic: () => void,
     onEnd: () => void) {
         this.drawLogic = drawLogic;
         this.calcLogic = calcLogic;
         this.onEnd = onEnd;
 
-        this.renderFrame = createCanvasList(40, width, height);
+        this.renderFrame = createCanvasList(400, width, height);
         this.headFrame = this.renderFrame;
 
         channel.port1.onmessage = (msg) => {
-            if (this.isEnd || (this.headFrame === this.renderFrame && !this.isFirst)) {
+            if (!this.shouldGo || this.isEnd || msg.data.isEnd || (this.headFrame === this.renderFrame && !this.isFirst)) {
                 return;
             }
             this.calcStartTime = performance.now();
-            this.exe.start(this.frameTime - (this.calcStartTime - msg.data));
+            this.exe.start(this.frameTime - (this.calcStartTime - msg.data.frameStartTime));
         }
 
         this.exe.entry(() => {
             this.calcHeadFrame();
         });
+
+        this.exe.end(() => {
+            endLogic();
+        });
     }
 
     startLoop() {
+        this.shouldGo = true;
         this.exe.start(3000);
     }
 
@@ -102,11 +113,12 @@ export class DoubleBuffer {
         this.drawLogic(this);
 
         if (isEnd) {
+            this.shouldGo = false;
             this.reset();
             this.onEnd();
             return;
         }
-        port.postMessage(this.frameStartTime);
+        port.postMessage({ frameStartTime: this.frameStartTime, isEnd });
         requestAnimationFrame(() => {
             this.drawFrame();
         });
@@ -119,7 +131,9 @@ export class DoubleBuffer {
                 this.isEnd = true;
                 this.exe.stop();
             }
+            this.headFrame.isReady = true;
             this.headFrame = this.headFrame.next as canvasI;
+            this.headFrame.isReady = false;
             this.headNum++;
             if (this.headFrame === this.renderFrame) {
                 this.exe.stop();
@@ -129,7 +143,6 @@ export class DoubleBuffer {
                 requestAnimationFrame(() => {
                     this.drawFrame();
                 });
-                this.exe.stop();
             }
         });
     }

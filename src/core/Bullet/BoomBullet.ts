@@ -37,8 +37,9 @@ export class BoomBullet extends Bullet {
     }
 
     go() {
+        if (this.isDirty) return;
         if (this.life <= 0) {
-            this.game.removeBullet(this);
+            this.isDirty = true;
         }
         if (!this.isBoomed) {
             let target = this.game.enemySet.findEnemysAroundEnemy(this.enemy, this.hero.level);

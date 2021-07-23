@@ -13,7 +13,7 @@ export class BoomHook implements EnemyHook {
     }
 
     beforeDestory(enemy: Enemy, color?: [number, number, number]) {
-        enemy.game.bullets.push(new BoomBullet(this.ATK, enemy, enemy.game, this.hero, {
+        enemy.game.pushBullet(new BoomBullet(this.ATK, enemy, enemy.game, this.hero, {
             color
         }));
     }

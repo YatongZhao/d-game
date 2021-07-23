@@ -38,6 +38,7 @@ export class SpecialLightningBullet extends Bullet {
         this.y = this.game.targetY;
     }
     go() {
+        if (this.isDirty) return;
         this.y -= this.speed;
         this.game.enemySet.findEnemyByY(this.y).forEach(enemy => {
             enemy.hited(this.ATK);
@@ -45,7 +46,7 @@ export class SpecialLightningBullet extends Bullet {
 
         if (this.y <= 0 || (this.game.stage[this.game.stageNumber].isEnd
             && this.game.enemySet.length === 0)) {
-            this.game.removeBullet(this);
+            this.isDirty = true;
         }
     }
 

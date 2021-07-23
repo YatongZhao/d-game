@@ -82,4 +82,33 @@ test('execute machine: 重启2正常', () => {
     exe.start();
 });
 
+test('execute machine: 跳过后续block正常', () => {
+    let exe = new ExecuteMachine();
+
+    let fn1 = () => {
+        exe.block(() => {
+            let now = performance.now();
+            while (performance.now() - now < 4) {
+                
+            }
+        });
+        return exe.block(() => {
+
+        });
+    }
+
+    exe.entry(() => {
+        fn1();
+        exe.block(() => {
+            expect(true).toBe(false);
+        });
+        exe.block(() => {
+
+        });
+    });
+
+    exe.start(2);
+    // exe.start(2);
+});
+
 export {};
