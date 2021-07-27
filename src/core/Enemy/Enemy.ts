@@ -31,6 +31,7 @@ export class Enemy {
     beforeDestory: ((enemy: Enemy) => void)[] = [];
     hooks: EnemyHook[] = [];
     speed = 0.5;
+    isDirty = false;
 
     x = 0;
     y = 0;

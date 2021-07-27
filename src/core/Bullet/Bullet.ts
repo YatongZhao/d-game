@@ -54,7 +54,7 @@ export class DefaultBullet extends Bullet {
             this.point.x += Math.sin(this.direction);
 
             let enemy = this.game.enemySet.findEnemyByPoint(this.point);
-            if (enemy) {
+            if (enemy && !enemy.isDirty) {
                 let isKilled = enemy.hited(this.ATK);
                 if (isKilled) {
                     this.hero.addKillNumber();

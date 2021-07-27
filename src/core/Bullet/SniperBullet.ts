@@ -51,7 +51,7 @@ export class SniperBullet extends Bullet {
             this.point.x += this.sin;
 
             let enemy = this.game.enemySet.findEnemyByPoint(this.point);
-            if (enemy && !this.harmdEnemy.has(enemy)) {
+            if (enemy && !enemy.isDirty && !this.harmdEnemy.has(enemy)) {
                 this.harmdEnemy.add(enemy);
                 let isKilled = enemy.hited(this.damage);
                 if (isKilled) {

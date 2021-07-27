@@ -41,6 +41,7 @@ export class SniperHero extends Hero {
         if (!this.target) {
             let maxEnemy: Enemy | null = this.game.enemySet.get(0);
             this.game.enemySet.forEach(enemy => {
+                if (enemy.isDirty) return;
                 if (!maxEnemy || (!enemy.isPicked && enemy.value > maxEnemy.value)) {
                     maxEnemy = enemy;
                 }

@@ -83,7 +83,9 @@ export class LightningHero extends Hero {
             let smallNum = len >= this.targetMaxLength ? this.targetMaxLength : len;
             let set = new Set<Enemy>();
             while (set.size < smallNum) {
-                set.add(this.game.enemySet.getNotNull(Math.floor(Math.random()*len)));
+                let enemy = this.game.enemySet.getNotNull(Math.floor(Math.random()*len));
+                if (enemy.isDirty) continue;
+                set.add(enemy);
             }
             this._targets = set;
         }

@@ -61,7 +61,7 @@ export class BoomHero extends Hero {
 
     go() {
         if (!this.target) {
-            let enemys = this.game.enemySet.filter(enemy => !!(enemy && !enemy.isPickedByBoom));
+            let enemys = this.game.enemySet.filter(enemy => !!(enemy && !enemy.isDirty && !enemy.isPickedByBoom));
             if (enemys.length === 0) {
                 return super.go();
             }
@@ -90,7 +90,7 @@ export class BoomHero extends Hero {
 
     startSpecialMove() {
         this.game.enemySet.filter(enemy => {
-            return !!(enemy && enemy.isPickedByBoom);
+            return !!(enemy && !enemy.isDirty && enemy.isPickedByBoom);
         }).forEach(enemy => {
             enemy?.hooks.forEach(hook => {
                 if (hook instanceof BoomHook) {

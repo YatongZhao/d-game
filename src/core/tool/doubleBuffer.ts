@@ -49,7 +49,7 @@ export class DoubleBuffer {
 
     frameStartTime = performance.now();
     calcStartTime = 0;
-    frameTime = 12;
+    frameTime = 14;
 
     exe = new ExecuteMachine();
 
@@ -87,7 +87,7 @@ export class DoubleBuffer {
 
     startLoop() {
         this.shouldGo = true;
-        this.exe.start(3000);
+        this.exe.start(300);
     }
 
     private reset() {

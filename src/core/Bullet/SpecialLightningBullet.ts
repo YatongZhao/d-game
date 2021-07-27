@@ -41,6 +41,7 @@ export class SpecialLightningBullet extends Bullet {
         if (this.isDirty) return;
         this.y -= this.speed;
         this.game.enemySet.findEnemyByY(this.y).forEach(enemy => {
+            if (enemy.isDirty) return;
             enemy.hited(this.ATK);
         });
 

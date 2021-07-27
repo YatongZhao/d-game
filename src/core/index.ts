@@ -142,19 +142,7 @@ export class Game {
     HP = 1000;
     renderHP = 1000;
     result: 'win' | 'loose' | 'initial' = 'initial';
-    private _result: 'win' | 'loose' | 'initial' = 'initial';
-    private _round: 'strategy' | 'fighting' = 'strategy';
-    get round() {
-        return this._round;
-    }
-    set round(newRound: 'strategy' | 'fighting') {
-        this._round = newRound;
-        if (this.setRound) this.setRound(newRound);
-        if (newRound === 'fighting') {
-            // this.goFighting();
-            this.db.startLoop();
-        }
-    }
+    round: 'strategy' | 'fighting' = 'strategy';
     stageNumber = 0;
     stage = createStages(this);
 
@@ -188,11 +176,14 @@ export class Game {
             }
         },
         db => this.calcLogic(db),
-        () => this.flushBullet(),
         () => {
-            if (this._result !== 'initial') {
-                this.setResult(this._result);
-                this._result = 'initial';
+            this.flushBullet();
+            this.enemySet.flushEnemy();
+        },
+        () => {
+            this.setRound && this.setRound('strategy');
+            if (this.result !== 'initial' && this.setEnd) {
+                this.setEnd(true);
             }
         });
 
@@ -213,6 +204,12 @@ export class Game {
             ctx.strokeStyle = 'black';
             ctx.closePath();
         }
+    }
+
+    startFighting() {
+        this.round = 'fighting';
+        this.setRound && this.setRound('fighting');
+        this.db.startLoop();
     }
 
     restart() {
@@ -290,6 +287,7 @@ export class Game {
             this.stage[this.stageNumber].go();
     
             this.enemySet.forEach(enemy => {
+                if (enemy.isDirty) return;
                 enemy.go();
                 if (enemy.point.y >= this.targetY - enemy.size) {
                     this.removeEnemy(enemy);
@@ -318,7 +316,7 @@ export class Game {
             let isLoose = this.HP <= 0;
     
             if (isLoose) {
-                this._result = 'loose';
+                this.result = 'loose';
             }
     
             let isWin = this.stage[this.stageNumber].isEnd
@@ -330,7 +328,7 @@ export class Game {
                 this.round = 'strategy';
                 this.stageNumber++;
                 if (this.stageNumber === this.stage.length) {
-                    this._result = 'win';
+                    this.result = 'win';
                 } else {
                     this.stage[this.stageNumber].award();
                 }
@@ -376,9 +374,9 @@ export class Game {
             ctx.drawImage(this.heroPosCanvas, 0, this.height - 120);
     
         });
-        this.db.exe.block(() => {
-            this.enemySet.forEach(enemy => {
-                if (!ctx) return;
+        this.enemySet.forEach(enemy => {
+            this.db.exe.block(() => {
+                if (!ctx || enemy.isDirty) return;
                 enemy.render(ctx);
             });
         });
@@ -406,19 +404,19 @@ export class Game {
             ctx.strokeStyle = 'black';
         });
 
-        // this.db.exe.block(() => {
-        //     if (!ctx) return;
+        this.db.exe.block(() => {
+            if (!ctx) return;
 
-        //     // 性能监测
-        //     ctx.beginPath();
-        //     ctx.fillRect(10, 200, (this.db.headNum - this.db.renderNum) * 1, 10);
+            // 性能监测
+            ctx.beginPath();
+            ctx.fillRect(10, 200, (this.db.headNum - this.db.renderNum) * 1, 10);
             
-        //     this.db.exe.blockStateList.forEach((item, i) => {
-        //         ctx.fillRect(10, 220 + i * 10, (item?.consumingTime || 0) * 50, 5);
-        //         ctx.fillText(`${i}`, 5, 220 + i * 10 + 7);
-        //     });
-        //     ctx.closePath();
-        // });
+            // this.db.exe.blockStateList.forEach((item, i) => {
+            //     ctx.fillRect(10, 220 + i * 10, (item?.consumingTime || 0) * 50, 5);
+            //     ctx.fillText(`${i}`, 5, 220 + i * 10 + 7);
+            // });
+            ctx.closePath();
+        });
 
         this.db.exe.block(() => {
             if (!ctx) return;
@@ -440,14 +438,18 @@ export class Game {
             ctx.closePath();
         });
         
+        
+        this.bullets.forEach(bullet => {
+            this.db.exe.block(() => {
+                if (!ctx) return;
+                ctx.beginPath();
+                bullet.render(ctx);
+                ctx.closePath();
+            });
+        });
+        
         this.db.exe.block(() => {
             if (!ctx) return;
-
-            ctx.beginPath();
-            this.bullets.forEach(bullet => {
-                bullet.render(ctx);
-            });
-            ctx.closePath();
     
             if (this.mouseSelectItem) {
                 this.mouseSelectItem.render(ctx, [
@@ -502,10 +504,10 @@ export class Game {
         this.coreRender(this.canvas);
     }
 
-    setResult(isWin: 'win' | 'loose') {
-        this.result = isWin;
-        this.setEnd && this.setEnd(true);
-    }
+    // setResult(isWin: 'win' | 'loose') {
+    //     this.result = isWin;
+    //     this.setEnd && this.setEnd(true);
+    // }
 
     addOffStageHero(hero: Hero | null, position?: 0|1|2|3|4|5|6|7|8) {
         if (position === undefined) {

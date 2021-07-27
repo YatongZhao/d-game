@@ -188,7 +188,7 @@ const App = () => {
             </div>
             <div>
                 {round === 'strategy' && <button className={s.startFighting} onClick={() => {
-                    game.round = 'fighting';
+                    game.startFighting();
                     setIsShopOpen(false);
                 }}>开始阻击</button>}
             </div>
