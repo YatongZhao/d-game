@@ -200,6 +200,7 @@ const App = () => {
                 </div>}
             </div>
         </div>
+        <a className={s.newLink} href="/d-game-2">新版本地址（开发中）</a>
     </>
 }
 export default App;

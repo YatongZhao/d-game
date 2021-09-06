@@ -96,3 +96,7 @@
     color: gray;
     z-index: -100;
 }
+.newLink {
+    position: relative;
+    z-index: 100000;
+}
